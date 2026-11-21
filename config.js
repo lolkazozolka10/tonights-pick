@@ -1,0 +1,1 @@
+window.TMDB_KEY = "fffc9e66335322781bad7945779911bc";
