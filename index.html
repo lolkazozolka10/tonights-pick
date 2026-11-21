@@ -6,6 +6,7 @@
 <title>Tonight’s Pick</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Cpath d=%27M8 10h32a4 4 0 0 1 4 4v6a4 4 0 0 0 0 8v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-6a4 4 0 0 0 0-8v-6a4 4 0 0 1 4-4z%27 fill=%27%23C7785B%27/%3E%3Ccircle cx=%2714%27 cy=%2717.5%27 r=%272.4%27 fill=%27%23fff%27/%3E%3Ccircle cx=%2720%27 cy=%2724%27 r=%272.4%27 fill=%27%23fff%27/%3E%3Ccircle cx=%2726%27 cy=%2730.5%27 r=%272.4%27 fill=%27%23fff%27/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -109,7 +110,7 @@
   .pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
   .pill{font-size:12.5px;border-radius:999px;padding:4px 10px;background:var(--sage-soft);color:#4E6853}
   .pill.plat{background:var(--accent-soft);color:var(--accent-dark)}
-  .again{
+  .again{display:flex;align-items:center;justify-content:center;gap:8px;
     margin-top:auto;border:1px solid var(--line);background:transparent;border-radius:12px;
     padding:12px;font:inherit;font-weight:500;color:var(--ink);cursor:pointer;width:100%;
   }
@@ -206,16 +207,85 @@
   .modal iframe{width:100%;height:100%;border:0}
   .modal .close{position:absolute;top:-44px;right:0;background:var(--card);color:var(--ink);border:0;border-radius:999px;width:36px;height:36px;font-size:18px;cursor:pointer}
   html[data-theme="dark"] .hero .tag{background:rgba(42,36,32,.9);color:var(--ink)}
+
+  /* ---------- odświeżenie wyglądu ---------- */
+  body{background:radial-gradient(1200px 500px at 50% -120px,var(--accent-soft),transparent 70%),var(--bg);min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.07;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  html[data-theme="dark"] body::before{mix-blend-mode:screen;opacity:.05;filter:invert(1)}
+  .wrap{position:relative;z-index:1}
+  .ico{width:18px;height:18px;flex:none;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .ico.fill{fill:currentColor;stroke:none}
+  .ico-slot{display:inline-flex}
+  .icon-btn .ico{width:17px;height:17px}
+  .lang-wrap .ico{width:18px;height:18px;color:var(--muted)}
+  .logo-mark{width:52px;height:52px;display:block;margin:0 auto 10px;transform:rotate(-8deg);filter:drop-shadow(0 4px 10px rgba(199,120,91,.25))}
+  header .mark{display:none}
+  .chip .ico{width:16px;height:16px;color:var(--accent-dark)}
+  .segment button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  .segment .ico{width:17px;height:17px}
+  .draw .ico{width:20px;height:20px}
+  /* zwijane filtry */
+  details.morefilters{display:block;width:100%;border-top:1px dashed var(--line);margin-top:4px}
+  .group-head .hint{margin-right:auto;margin-left:10px;font-size:12.5px}
+  details.morefilters summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:16px 0;font-weight:600;color:var(--ink);user-select:none}
+  details.morefilters summary::-webkit-details-marker{display:none}
+  details.morefilters summary .chev{margin-left:auto;color:var(--muted);transition:transform .2s}
+  details.morefilters[open] summary .chev{transform:rotate(180deg)}
+  details.morefilters summary:hover{color:var(--accent-dark)}
+  .badge{background:var(--accent);color:#fff;border-radius:999px;font-size:12px;padding:1px 8px;font-weight:600}
+  .badge:empty{display:none}
+  html[data-theme="dark"] .badge{color:#1F1A17}
+  details.morefilters > .group:first-of-type{border-top:0;padding-top:4px}
+  @media (max-width:879px){
+    .draw-row{position:sticky;bottom:12px;z-index:5;background:var(--card);padding:10px;margin:8px -10px 0;border-radius:18px;box-shadow:0 8px 28px rgba(58,47,41,.18)}
+  }
+  /* filmowa karta wyniku */
+  .result{--tint:var(--card);background:linear-gradient(180deg,color-mix(in srgb,var(--tint) 22%,var(--card)) 0%,var(--card) 55%);transition:background .6s;overflow:hidden}
+  .hero{margin:-24px -24px 0;border-radius:var(--radius) var(--radius) 0 0;aspect-ratio:16/9;overflow:visible;position:relative}
+  .hero::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,transparent 45%,color-mix(in srgb,var(--tint) 22%,var(--card)) 100%)}
+  .hero .poster-img{left:24px;bottom:-52px;width:118px;max-width:none;border-radius:12px;z-index:2;box-shadow:0 10px 30px rgba(0,0,0,.35);border:3px solid var(--card)}
+  .hero .tag{z-index:2;top:14px;right:14px;bottom:auto}
+  .headline{padding-left:136px;min-height:64px;margin:10px 0 18px}
+  .headline .title{font-size:25px}
+  .headline .orig{margin:4px 0 0}
+  .result{position:relative}
+  .result .back{position:absolute;top:14px;left:14px;z-index:3;margin:0;display:inline-flex;align-items:center;gap:6px;background:rgba(255,251,245,.92);color:#3A2F29;border-radius:999px;padding:6px 12px;font-size:13px}
+  .result .back .ico{width:14px;height:14px}
+  html[data-theme="dark"] .draw.alt{color:var(--accent-dark)}
+  html{background:var(--bg)}
+  .meta .ico{width:16px;height:16px;color:var(--muted)}
+  .score{display:inline-flex;align-items:center;gap:5px}
+  .score .ico{color:var(--accent);width:16px;height:16px}
+  .act .ico{width:16px;height:16px}
+  .act.trailer .ico{width:13px;height:13px}
+  .more-link{display:inline-flex;align-items:center;gap:5px}
+  .more-link .ico{width:14px;height:14px}
+  @media (max-width:520px){ .hero{margin:-18px -18px 0} .hero .poster-img{left:18px;width:96px;bottom:-44px} .headline{padding-left:112px;min-height:52px} .headline .title{font-size:21px} }
+  /* stany puste */
+  .empty .big-ico{width:64px;height:64px;color:var(--accent);opacity:.85;margin:0 auto 12px;display:block}
+  .empty .big-ico .ico{width:64px;height:64px;stroke-width:1.3}
+  /* animacja tasowania */
+  .reel{margin:auto;display:flex;align-items:center;justify-content:center;height:280px;position:relative;width:100%}
+  .reel img{position:absolute;width:140px;aspect-ratio:2/3;object-fit:cover;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);border:3px solid var(--card);transition:transform .18s ease,opacity .18s}
+  .reel img.l{transform:translateX(-70px) rotate(-10deg) scale(.86);opacity:.7}
+  .reel img.r{transform:translateX(70px) rotate(10deg) scale(.86);opacity:.7}
+  .reel img.c{transform:none;z-index:2}
+  .reel.go img.c{animation:pop .16s ease}
+  @keyframes pop{from{transform:scale(.92) rotate(-3deg)}to{transform:none}}
+  .spin .ico{animation:spin 1s linear infinite}
+  .relaxnote{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted);background:var(--bg);border-radius:10px;padding:8px 12px;margin:0 0 12px}
+  .relaxnote .ico{width:15px;height:15px;margin-top:2px;flex:none}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <label class="lang-wrap"><span aria-hidden="true">🌍</span><select id="langSel" class="lang-sel" aria-label="Language"></select></label>
-    <button class="icon-btn" id="themeBtn" type="button">🌙</button>
+    <label class="lang-wrap"><span class="ico-slot" data-ico="globe"></span><select id="langSel" class="lang-sel" aria-label="Language"></select></label>
+    <button class="icon-btn" id="themeBtn" type="button"></button>
   </div>
   <header>
-    <span class="mark" aria-hidden="true">🍿</span>
+    <svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 10h32a4 4 0 0 1 4 4v6a4 4 0 0 0 0 8v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-6a4 4 0 0 0 0-8v-6a4 4 0 0 1 4-4z" fill="var(--accent)"/><path d="M33 13v22" stroke="var(--card)" stroke-width="1.6" stroke-dasharray="2.2 3" stroke-linecap="round"/><circle cx="14" cy="17.5" r="2.4" fill="var(--card)"/><circle cx="20" cy="24" r="2.4" fill="var(--card)"/><circle cx="26" cy="30.5" r="2.4" fill="var(--card)"/></svg>
     <h1>Tonight’s Pick</h1>
     <p data-i18n="subtitle"></p>
   </header>
@@ -230,23 +300,25 @@
         </div>
       </div>
       <div class="group">
-        <div class="group-head"><h2 data-i18n="hWatch"></h2><span class="hint" data-i18n="watchHint"></span></div>
-        <select id="watchSel" class="select-sel" aria-label="Country"></select>
-      </div>
-      <div class="group">
-        <div class="group-head"><h2 data-i18n="hPlat"></h2><button class="clear" data-clear="plat" data-i18n="clear"></button></div>
+        <div class="group-head"><h2 data-i18n="hPlat"></h2><span class="hint" id="platWhere"></span><button class="clear" data-clear="plat" data-i18n="clear"></button></div>
         <div class="chips" id="plat"></div>
-      </div>
-      <div class="group">
-        <div class="group-head"><h2 data-i18n="hRegion"></h2></div>
-        <div class="segment two" id="region">
-          <button data-v="eu"><span aria-hidden="true">🇪🇺</span> <span data-i18n="europe"></span></button>
-          <button data-v="world"><span aria-hidden="true">🌎</span> <span data-i18n="world"></span></button>
-        </div>
       </div>
       <div class="group">
         <div class="group-head"><h2 data-i18n="hMood"></h2><button class="clear" data-clear="mood" data-i18n="clear"></button></div>
         <div class="chips" id="mood"></div>
+      </div>
+      <details class="morefilters" id="more">
+        <summary><span class="ico-slot" data-ico="sliders"></span> <span data-i18n="moreFilters"></span> <span class="badge" id="activeCount"></span><span class="ico-slot chev" data-ico="chevron"></span></summary>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hWatch"></h2><span class="hint" data-i18n="watchHint"></span></div>
+        <select id="watchSel" class="select-sel" aria-label="Country"></select>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hRegion"></h2></div>
+        <div class="segment two" id="region">
+          <button data-v="eu"><span class="ico-slot" data-ico="eu"></span> <span data-i18n="europe"></span></button>
+          <button data-v="world"><span class="ico-slot" data-ico="globe"></span> <span data-i18n="world"></span></button>
+        </div>
       </div>
       <div class="group">
         <div class="group-head"><h2 data-i18n="hLen"></h2><button class="clear" data-clear="len" data-i18n="clear"></button></div>
@@ -272,8 +344,9 @@
         <div class="group-head"><h2 data-i18n="hExtra"></h2></div>
         <div class="chips" id="opts"></div>
       </div>
+      </details>
       <div class="draw-row">
-        <button class="draw" id="draw"><span aria-hidden="true">🎲</span> <span data-i18n="draw"></span></button>
+        <button class="draw" id="draw"><span class="ico-slot" data-ico="dice"></span> <span data-i18n="draw"></span></button>
         <button class="draw alt" id="draw3"><span data-i18n="draw3"></span></button>
       </div>
       <div class="count" id="count"></div>
@@ -289,7 +362,7 @@
   </div>
   <footer><span data-i18n="footer"></span> <a href="https://www.themoviedb.org/" target="_blank" rel="noopener" style="color:inherit">themoviedb.org</a></footer>
 </div>
-<div class="modal" id="modal" hidden><div class="box"><button class="close" type="button">×</button><div class="frame"></div></div></div>
+<div class="modal" id="modal" hidden><div class="box"><button class="close" type="button"></button><div class="frame"></div></div></div>
 <script src="config.js"></script>
 <script>
 /* =========================================================
@@ -337,7 +410,7 @@ const MOOD_NAMES = {
 };
 
 const I18N = {
-  pl:{subtitle:"Wybierz, na co masz ochotę, a my wylosujemy coś do obejrzenia.",hType:"Rodzaj",any:"Obojętnie",film:"Film",serial:"Serial",
+  pl:{relaxed:"Nic nie spełniało wszystkich warunków, więc filtry zostały poluzowane: ten tytuł może mieć mniej ocen albo być dostępny tylko do wypożyczenia.",moreFilters:"Więcej filtrów",showAll:"Pokaż też niedostępne w abonamentach",subtitle:"Wybierz, na co masz ochotę, a my wylosujemy coś do obejrzenia.",hType:"Rodzaj",any:"Obojętnie",film:"Film",serial:"Serial",
     hWatch:"Oglądam w kraju",watchHint:"Od tego zależą platformy i dostępność.",hRegion:"Skąd pochodzi",europe:"Tylko Europa",world:"Cały świat",
     hMood:"Nastrój",hLen:"Długość",hPlat:"Moje platformy",hGenre:"Kategoria",hEra:"Epoka",hRating:"Minimalna ocena",hCountry:"Kraj produkcji",hExtra:"Dodatkowo",
     kids:"Dla dzieci",skipWatched:"Pomiń obejrzane",onlyNew:"Tylko nowości",clear:"wyczyść",draw:"Losuj",draw3:"Losuj 3",again:"Wylosuj coś innego",
@@ -352,7 +425,7 @@ const I18N = {
     found:n=>`Pasujących tytułów: ${n.toLocaleString("pl")}`,platLoading:"Ładuję platformy…",
     short:"Krótko",mid:"Średnio",long:"Długo",fS:"do 100 min",fM:"100–130 min",fL:"ponad 130 min",sS:"odc. do 35 min",sM:"odc. 35–55 min",sL:"odc. ponad 55 min",
     perEp:"min / odcinek",filters:"Filtry",footer:"Dane i zdjęcia: TMDB. Ten produkt korzysta z API TMDB, ale nie jest przez TMDB wspierany ani certyfikowany. Dane o platformach: JustWatch."},
-  en:{subtitle:"Pick what you're in the mood for and we'll draw something to watch.",hType:"Type",any:"Any",film:"Film",serial:"Series",
+  en:{relaxed:"Nothing matched every filter, so they were loosened: this title may have fewer ratings or be available to rent only.",moreFilters:"More filters",showAll:"Include titles not on subscription",subtitle:"Pick what you're in the mood for and we'll draw something to watch.",hType:"Type",any:"Any",film:"Film",serial:"Series",
     hWatch:"I watch in",watchHint:"This sets the platforms and availability.",hRegion:"Made in",europe:"Europe only",world:"Whole world",
     hMood:"Mood",hLen:"Length",hPlat:"My platforms",hGenre:"Genre",hEra:"Era",hRating:"Minimum rating",hCountry:"Country of origin",hExtra:"Extras",
     kids:"For kids",skipWatched:"Skip watched",onlyNew:"New releases only",clear:"clear",draw:"Draw",draw3:"Draw 3",again:"Draw something else",
@@ -366,7 +439,7 @@ const I18N = {
     seasons:n=>`${n} season${n===1?"":"s"}`,found:n=>`Matching titles: ${n.toLocaleString("en")}`,platLoading:"Loading platforms…",
     short:"Short",mid:"Medium",long:"Long",fS:"up to 100 min",fM:"100–130 min",fL:"over 130 min",sS:"ep. up to 35 min",sM:"ep. 35–55 min",sL:"ep. over 55 min",
     perEp:"min / episode",filters:"Filters",footer:"Data and images: TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. Streaming data: JustWatch."},
-  sv:{subtitle:"Välj vad du är sugen på, så lottar vi fram något att titta på.",hType:"Typ",any:"Spelar ingen roll",film:"Film",serial:"Serie",
+  sv:{relaxed:"Inget matchade alla filter, så de har lättats: titeln kan ha färre betyg eller bara finnas att hyra.",moreFilters:"Fler filter",showAll:"Visa även titlar utan abonnemang",subtitle:"Välj vad du är sugen på, så lottar vi fram något att titta på.",hType:"Typ",any:"Spelar ingen roll",film:"Film",serial:"Serie",
     hWatch:"Jag tittar i",watchHint:"Styr vilka tjänster och titlar som finns.",hRegion:"Gjord i",europe:"Bara Europa",world:"Hela världen",
     hMood:"Stämning",hLen:"Längd",hPlat:"Mina tjänster",hGenre:"Genre",hEra:"Epok",hRating:"Lägsta betyg",hCountry:"Produktionsland",hExtra:"Extra",
     kids:"För barn",skipWatched:"Hoppa över sedda",onlyNew:"Bara nyheter",clear:"rensa",draw:"Lotta",draw3:"Lotta 3",again:"Lotta något annat",
@@ -380,7 +453,7 @@ const I18N = {
     seasons:n=>`${n} ${n===1?"säsong":"säsonger"}`,found:n=>`Matchande titlar: ${n.toLocaleString("sv")}`,platLoading:"Laddar tjänster…",
     short:"Kort",mid:"Mellan",long:"Lång",fS:"upp till 100 min",fM:"100–130 min",fL:"över 130 min",sS:"avsn. upp till 35 min",sM:"avsn. 35–55 min",sL:"avsn. över 55 min",
     perEp:"min / avsnitt",filters:"Filter",footer:"Data och bilder: TMDB. Denna produkt använder TMDB:s API men är inte godkänd eller certifierad av TMDB. Streamingdata: JustWatch."},
-  de:{subtitle:"Wähle, worauf du Lust hast, und wir losen etwas für dich aus.",hType:"Art",any:"Egal",film:"Film",serial:"Serie",
+  de:{relaxed:"Nichts passte zu allen Filtern, daher wurden sie gelockert: Dieser Titel hat evtl. weniger Bewertungen oder ist nur leihbar.",moreFilters:"Weitere Filter",showAll:"Auch Titel ohne Abo zeigen",subtitle:"Wähle, worauf du Lust hast, und wir losen etwas für dich aus.",hType:"Art",any:"Egal",film:"Film",serial:"Serie",
     hWatch:"Ich schaue in",watchHint:"Bestimmt Dienste und Verfügbarkeit.",hRegion:"Herkunft",europe:"Nur Europa",world:"Ganze Welt",
     hMood:"Stimmung",hLen:"Länge",hPlat:"Meine Dienste",hGenre:"Genre",hEra:"Epoche",hRating:"Mindestbewertung",hCountry:"Produktionsland",hExtra:"Extras",
     kids:"Für Kinder",skipWatched:"Gesehenes überspringen",onlyNew:"Nur Neuheiten",clear:"leeren",draw:"Auslosen",draw3:"3 auslosen",again:"Etwas anderes auslosen",
@@ -394,7 +467,7 @@ const I18N = {
     seasons:n=>`${n} ${n===1?"Staffel":"Staffeln"}`,found:n=>`Passende Titel: ${n.toLocaleString("de")}`,platLoading:"Lade Dienste…",
     short:"Kurz",mid:"Mittel",long:"Lang",fS:"bis 100 Min.",fM:"100–130 Min.",fL:"über 130 Min.",sS:"Folge bis 35 Min.",sM:"Folge 35–55 Min.",sL:"Folge über 55 Min.",
     perEp:"Min. / Folge",filters:"Filter",footer:"Daten und Bilder: TMDB. Dieses Produkt nutzt die TMDB-API, ist aber nicht von TMDB unterstützt oder zertifiziert. Streaming-Daten: JustWatch."},
-  fr:{subtitle:"Choisis ce qui te fait envie, et on tire au sort quelque chose à regarder.",hType:"Type",any:"Peu importe",film:"Film",serial:"Série",
+  fr:{relaxed:"Rien ne correspondait à tous les filtres, ils ont donc été assouplis : ce titre a peut-être moins de notes ou n’est disponible qu’en location.",moreFilters:"Plus de filtres",showAll:"Inclure les titres hors abonnement",subtitle:"Choisis ce qui te fait envie, et on tire au sort quelque chose à regarder.",hType:"Type",any:"Peu importe",film:"Film",serial:"Série",
     hWatch:"Je regarde en/au",watchHint:"Définit les plateformes et la disponibilité.",hRegion:"Origine",europe:"Europe seulement",world:"Monde entier",
     hMood:"Humeur",hLen:"Durée",hPlat:"Mes plateformes",hGenre:"Genre",hEra:"Époque",hRating:"Note minimale",hCountry:"Pays de production",hExtra:"Options",
     kids:"Pour enfants",skipWatched:"Ignorer les vus",onlyNew:"Nouveautés seulement",clear:"effacer",draw:"Tirer au sort",draw3:"Tirer 3",again:"Tirer autre chose",
@@ -408,7 +481,7 @@ const I18N = {
     seasons:n=>`${n} saison${n===1?"":"s"}`,found:n=>`Titres correspondants : ${n.toLocaleString("fr")}`,platLoading:"Chargement des plateformes…",
     short:"Court",mid:"Moyen",long:"Long",fS:"jusqu’à 100 min",fM:"100–130 min",fL:"plus de 130 min",sS:"ép. jusqu’à 35 min",sM:"ép. 35–55 min",sL:"ép. plus de 55 min",
     perEp:"min / épisode",filters:"Filtres",footer:"Données et images : TMDB. Ce produit utilise l’API TMDB mais n’est ni approuvé ni certifié par TMDB. Données de streaming : JustWatch."},
-  es:{subtitle:"Elige lo que te apetece y sortearemos algo para ver.",hType:"Tipo",any:"Da igual",film:"Película",serial:"Serie",
+  es:{relaxed:"Nada cumplía todos los filtros, así que se han relajado: este título puede tener menos valoraciones o estar solo en alquiler.",moreFilters:"Más filtros",showAll:"Incluir títulos sin suscripción",subtitle:"Elige lo que te apetece y sortearemos algo para ver.",hType:"Tipo",any:"Da igual",film:"Película",serial:"Serie",
     hWatch:"Veo desde",watchHint:"Define las plataformas y la disponibilidad.",hRegion:"Origen",europe:"Solo Europa",world:"Todo el mundo",
     hMood:"Estado de ánimo",hLen:"Duración",hPlat:"Mis plataformas",hGenre:"Género",hEra:"Época",hRating:"Nota mínima",hCountry:"País de producción",hExtra:"Extras",
     kids:"Para niños",skipWatched:"Omitir vistos",onlyNew:"Solo novedades",clear:"borrar",draw:"Sortear",draw3:"Sortear 3",again:"Sortear otra cosa",
@@ -424,13 +497,51 @@ const I18N = {
     perEp:"min / episodio",filters:"Filtros",footer:"Datos e imágenes: TMDB. Este producto usa la API de TMDB pero no está respaldado ni certificado por TMDB. Datos de streaming: JustWatch."}
 };
 
+
+/* ---------- Ikony (proste ikony liniowe) ---------- */
+const ICONS={
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20.5 13.5A8.5 8.5 0 1 1 10.5 3.5a6.6 6.6 0 0 0 10 10z"/>',
+  smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01"/>',
+  drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  zap:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  bulb:'<path d="M9 18h6M10 21.5h4"/><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.5.4.8 1 .8 1.7V18h6v-2c0-.7.3-1.3.8-1.7A6.5 6.5 0 0 0 12 2.5z"/>',
+  cup:'<path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10.5h1.5a2.5 2.5 0 0 1 0 5H17M8 2.5c0 1.5 1 1.5 1 3M12 2.5c0 1.5 1 1.5 1 3"/>',
+  balloon:'<path d="M12 2.5a5.5 5.5 0 0 1 5.5 5.5c0 3.8-3.2 7-5.5 7s-5.5-3.2-5.5-7A5.5 5.5 0 0 1 12 2.5z"/><path d="M11 16.5h2M12 16.5c0 2.5-2 3-2 5"/>',
+  sparkle:'<path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/><path d="M19 15v5M16.5 17.5h5"/>',
+  eyeoff:'<path d="M3 3l18 18M10.6 5.1A9.8 9.8 0 0 1 12 5c6 0 9.5 7 9.5 7a17 17 0 0 1-2.9 3.7M6.6 6.6A17 17 0 0 0 2.5 12S6 19 12 19a9.4 9.4 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  unlock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.7"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  eu:Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return `<circle cx="${(12+7.5*Math.cos(a)).toFixed(2)}" cy="${(12+7.5*Math.sin(a)).toFixed(2)}" r="1.15" fill="currentColor" stroke="none"/>`}).join(""),
+  dice:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/>',
+  play:'<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  bookmark:'<path d="M6.5 3.5h11v17l-5.5-3.8-5.5 3.8z"/>',
+  bookmarkOn:'<path d="M6.5 3.5h11v17l-5.5-3.8-5.5 3.8z" fill="currentColor"/>',
+  star:'<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z" fill="currentColor" stroke="none"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  pin:'<path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  back:'<path d="M19 12H5M11 18l-6-6 6-6"/>',
+  chevron:'<path d="M6 9l6 6 6-6"/>',
+  sliders:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  film:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>',
+  key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>',
+  alert:'<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'
+};
+const ic=(n,cls="")=>`<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||""}</svg>`;
+const MOOD_ICON={L:"sun",H:"smile",C:"drop",T:"zap",M:"bulb",Z:"cup"};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
 /* ---------- Stan ---------- */
 let lang = "pl";
 const state = {type:"any", region:"eu", watch:"SE", rating:0, len:new Set(), plat:new Set(), country:new Set(), genre:new Set(), mood:new Set(), era:new Set(), opts:new Set()};
 const SETS = ["len","plat","country","genre","mood","era","opts"];
 let lists = {watched:[], later:[]};       // {id,type,title,year,poster}
 let listTab = "later";
-let view = {kind:"empty"}, lastKey = null;
+let view = {kind:"empty"}, lastKey = null, relaxed = false;
 const providerCache = {}, detailCache = {};
 
 const t = k => I18N[lang][k];
@@ -449,6 +560,11 @@ function save(){
     SETS.forEach(k=>o[k]=[...state[k]]);
     localStorage.setItem("tp-tmdb",JSON.stringify(o));
   }catch(e){}
+  updateActive();
+}
+function updateActive(){
+  const n=["len","genre","era","country","opts"].reduce((a,k)=>a+state[k].size,0)+(state.rating?1:0)+(state.region==="world"?1:0);
+  const b=document.getElementById("activeCount"); if(b) b.textContent=n||"";
 }
 function guessWatch(){
   const tz=(Intl.DateTimeFormat().resolvedOptions().timeZone||"");
@@ -471,6 +587,14 @@ function load(){
   lang=I18N[nav]?nav:"en";
 }
 
+/* ---------- Popularne platformy (reszta jest ukryta) ---------- */
+const POPULAR_IDS = new Set([
+  8,9,119,337,350,1899,384,1773,76,531,11,            // Netflix, Prime Video, Disney+, Apple TV+, Max, SkyShowtime, Viaplay, Paramount+, MUBI
+  493,442,431,383,323,338,505,381,304,2750,30,38,41,103,29,39,234,147,2241,62,63,541,222,359,109,72,360,15,386,2303
+]);
+const POPULAR_NAMES = /^(svt play|tv4 play|nrk tv|tv 2 play|dr tv|tv 2|yle areena|ruutu|player|polsat box go|canal\+|joyn|rtl\+|ard mediathek|zdf|bbc iplayer|itvx|channel 4|now tv|now|arte|m6\+|france\.tv|movistar plus\+|atres player|filmin|rtve|rai play|mediaset infinity|videoland|npo start|hulu|peacock premium)$/i;
+const isPopular = p => POPULAR_IDS.has(p.provider_id ?? p.id) || POPULAR_NAMES.test((p.provider_name ?? p.name ?? "").trim());
+
 /* ---------- TMDB ---------- */
 async function tmdb(path, params={}){
   const u=new URL(API+path);
@@ -486,8 +610,9 @@ async function tmdb(path, params={}){
 function genreIds(keys, kind){ // kind 0 film / 1 serial
   return [...new Set(keys.map(k=>GENRES[k][kind]).filter(Boolean))];
 }
-function buildQuery(kind){
-  const q={language:tmdbLang(), include_adult:"false", "vote_count.gte": kind===0?150:60, sort_by:"popularity.desc"};
+function buildQuery(kind, relax){
+  const votes = relax ? (kind===0?10:5) : state.country.size ? (kind===0?25:10) : (kind===0?150:60);
+  const q={language:tmdbLang(), include_adult:"false", "vote_count.gte": votes, sort_by:"popularity.desc"};
   const groups=[];
   if(state.genre.size){ const g=genreIds([...state.genre],kind); if(!g.length) return null; groups.push(g.join("|")); }
   if(state.mood.size){ const keys=[...state.mood].flatMap(m=>MOOD_GENRES[m]); const g=genreIds(keys,kind); if(!g.length) return null; groups.push(g.join("|")); }
@@ -495,6 +620,7 @@ function buildQuery(kind){
   if(groups.length) q.with_genres=groups.join(",");
   const without=[];
   if(state.opts.has("kids") || [...state.mood].some(m=>"LHZ".includes(m))) { if(kind===0) without.push(27); }
+  if(kind===1) without.push(10763,10764,10766,10767);   // bez wiadomości, reality show, telenowel i talk-show
   if(without.length) q.without_genres=without.join(",");
   // kraj produkcji
   const cs = state.country.size ? [...state.country] : (state.region==="eu" ? EUROPE : []);
@@ -513,15 +639,16 @@ function buildQuery(kind){
   const today=new Date().toISOString().slice(0,10);
   if(from) q[dk+".gte"]=from;
   q[dk+".lte"]= to && to<today ? to : today;
-  if(state.rating) q["vote_average.gte"]=state.rating;
+  q["vote_average.gte"]=state.rating||(relax?0:6);
   // platformy
   q.watch_region=state.watch;
   if(state.plat.size){ q.with_watch_providers=[...state.plat].join("|"); q.with_watch_monetization_types="flatrate"; }
+  else if(!state.opts.has("all") && !relax) q.with_watch_monetization_types="flatrate|free|ads";   // tylko to, co da się obejrzeć w abonamencie lub za darmo
   return q;
 }
 
-async function discover(kind, n){
-  const q=buildQuery(kind);
+async function discover(kind, n, relax){
+  const q=buildQuery(kind, relax);
   if(!q) return {items:[],total:0};
   const path = kind===0 ? "/discover/movie" : "/discover/tv";
   const first=await tmdb(path,{...q,page:1});
@@ -555,7 +682,7 @@ async function loadProviders(){
     const pr=(p.display_priorities||{})[reg] ?? p.display_priority ?? 999;
     if(!map[p.provider_id] || map[p.provider_id].pr>pr) map[p.provider_id]={id:p.provider_id,name:p.provider_name,logo:p.logo_path,pr};
   });
-  return providerCache[reg]=Object.values(map).sort((a,b)=>a.pr-b.pr).slice(0,18);
+  return providerCache[reg]=Object.values(map).filter(isPopular).sort((a,b)=>a.pr-b.pr).slice(0,12);
 }
 
 /* ---------- Filtry (UI) ---------- */
@@ -578,7 +705,7 @@ function renderLen(){
   const sub = state.type==="movie"?[t("fS"),t("fM"),t("fL")]:state.type==="tv"?[t("sS"),t("sM"),t("sL")]:["","",""];
   fill("len",["s","m","l"].map((v,i)=>chip(L[i]+(sub[i]?` <small>${sub[i]}</small>`:""),v,"len")));
 }
-function renderRating(){ fill("rating", RATINGS.map(r=>chip(`★ ${r}+`,r,"rating",true))); }
+function renderRating(){ fill("rating", RATINGS.map(r=>chip(`${ic("star")} ${r}+`,r,"rating",true))); }
 function renderCountries(){
   const list = state.region==="eu" ? EUROPE : [...EUROPE,...WORLD_EXTRA];
   const sorted=[...list].sort((a,b)=>cName(a).localeCompare(cName(b),lang));
@@ -594,6 +721,7 @@ function renderWatch(){
 async function renderPlatforms(){
   const el=document.getElementById("plat");
   if(!KEY){ el.innerHTML=""; return; }
+  document.getElementById("platWhere").textContent=`${flag(state.watch)} ${cName(state.watch)}`;
   el.innerHTML=`<span class="hint">${t("platLoading")}</span>`;
   try{
     const ps=await loadProviders();
@@ -601,18 +729,34 @@ async function renderPlatforms(){
   }catch(e){ el.innerHTML=`<span class="hint">${esc(e.code==="badKey"?t("badKey"):t("error"))}</span>`; }
 }
 function renderChips(){
-  fill("mood", MOODS.map(m=>chip(`${MOOD_EMOJI[m]} ${mName(m)}`,m,"mood")));
-  fill("genre", GENRE_KEYS.map(g=>chip(`${GENRE_EMOJI[g]} ${gName(g)}`,g,"genre")));
+  fill("mood", MOODS.map(m=>chip(`${ic(MOOD_ICON[m])} ${mName(m)}`,m,"mood")));
+  fill("genre", GENRE_KEYS.map(g=>chip(gName(g),g,"genre")));
   fill("era", ERAS.map(e=>chip(e.l,e.v,"era")));
-  fill("opts", [chip(`🧸 ${t("kids")}`,"kids","opts"), chip(`✨ ${t("onlyNew")}`,"new","opts"), chip(`👁️ ${t("skipWatched")}`,"skip","opts")]);
+  fill("opts", [chip(`${ic("balloon")} ${t("kids")}`,"kids","opts"), chip(`${ic("sparkle")} ${t("onlyNew")}`,"new","opts"), chip(`${ic("eyeoff")} ${t("skipWatched")}`,"skip","opts"), chip(`${ic("unlock")} ${t("showAll")}`,"all","opts")]);
   renderRating(); renderCountries(); renderLen(); renderWatch(); renderPlatforms();
 }
 
 /* ---------- Losowanie ---------- */
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* animacja: plakaty tasowane jak karty */
+async function reel(items, ms=1150){
+  const el=document.getElementById("result");
+  const posters=items.filter(x=>x.poster).map(x=>`${IMG}w185${x.poster}`);
+  if(posters.length<3 || window.matchMedia("(prefers-reduced-motion: reduce)").matches){ await sleep(250); return; }
+  posters.slice(0,12).forEach(u=>{ const i=new Image(); i.src=u; });
+  el.innerHTML=`<div class="reel"><img class="l" alt=""><img class="r" alt=""><img class="c" alt=""></div>`;
+  const box=el.querySelector(".reel"), [l,r,c]=box.querySelectorAll("img");
+  const n=Math.min(posters.length,12); let i=0;
+  const step=()=>{ l.src=posters[i%n]; c.src=posters[(i+1)%n]; r.src=posters[(i+2)%n]; box.classList.remove("go"); void box.offsetWidth; box.classList.add("go"); i++; };
+  step();
+  const timer=setInterval(step,110);
+  await sleep(ms); clearInterval(timer);
+}
+
 async function draw(n){
   const el=document.getElementById("result");
-  if(!KEY){ view={kind:"msg",text:t("noKey"),icon:"🔑"}; render(); return; }
+  if(!KEY){ view={kind:"msg",text:t("noKey"),icon:"key"}; render(); return; }
   if(window.innerWidth<880) el.scrollIntoView({behavior:"smooth",block:"start"});
   view={kind:"loading"}; render();
   document.getElementById("count").textContent="";
@@ -623,38 +767,63 @@ async function draw(n){
       const r=await discover(k,n); total+=r.total;
       if(r.items.length){ res=r; if(state.type!=="any" || n===1) break; res.items=res.items.concat((await discover(1-k,n)).items); break; }
     }
+    relaxed=false;
+    if(!res.items.length){
+      for(const k of kinds){ const r=await discover(k,n,true); if(r.items.length){ res=r; total=r.total; relaxed=true; break; } }
+    }
     let items=shuffle(res.items.filter(x=>keyOf(x)!==lastKey));
     if(!items.length) items=res.items;
     if(!items.length){ view={kind:"none"}; render(); return; }
     document.getElementById("count").textContent=t("found")(total);
-    if(n===3 && items.length>1){ view={kind:"trio",items:items.slice(0,3)}; render(); return; }
-    await openItem(items[0]);
-  }catch(e){ view={kind:"msg",text:e.code==="badKey"?t("badKey"):t("error"),icon:"⚠️"}; render(); }
+    if(n===3 && items.length>1){ await reel(items); view={kind:"trio",items:items.slice(0,3)}; render(); return; }
+    await openItem(items[0], null, items);
+  }catch(e){ view={kind:"msg",text:e.code==="badKey"?t("badKey"):t("error"),icon:"alert"}; render(); }
 }
-async function openItem(item, trio){
+async function openItem(item, trio, pool){
   lastKey=keyOf(item);
-  view={kind:"loading"}; render();
-  try{ const d=await details(item); view={kind:"item",item,d,trio}; }
-  catch(e){ view={kind:"msg",text:e.code==="badKey"?t("badKey"):t("error"),icon:"⚠️"}; }
+  if(!pool){ view={kind:"loading"}; render(); }
+  try{
+    const [d]=await Promise.all([details(item), pool?reel(pool):Promise.resolve()]);
+    view={kind:"item",item,d,trio};
+  }catch(e){ view={kind:"msg",text:e.code==="badKey"?t("badKey"):t("error"),icon:"alert"}; }
   render();
 }
 
+/* kolor karty dopasowany do plakatu */
+const tintCache={};
+function applyTint(path){
+  const card=document.getElementById("result");
+  if(!path){ card.style.removeProperty("--tint"); return; }
+  if(tintCache[path]){ card.style.setProperty("--tint",tintCache[path]); return; }
+  const img=new Image(); img.crossOrigin="anonymous";
+  img.onload=()=>{ try{
+    const c=document.createElement("canvas"); c.width=c.height=8; const x=c.getContext("2d");
+    x.drawImage(img,0,0,8,8); const px=x.getImageData(0,0,8,8).data;
+    let r=0,g=0,b=0,n=0; for(let i=0;i<px.length;i+=4){ r+=px[i]; g+=px[i+1]; b+=px[i+2]; n++; }
+    const col=`rgb(${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)})`;
+    tintCache[path]=col; if(view.kind==="item" && view.d.poster_path===path) card.style.setProperty("--tint",col);
+  }catch(e){} };
+  img.src=`${IMG}w92${path}`;
+}
+
 /* ---------- Wynik ---------- */
+const emptyBox=(icon,text,cls="")=>`<div class="empty fade"><span class="big-ico ${cls}">${ic(icon)}</span><p>${text}</p></div>`;
 function render(){
   const el=document.getElementById("result");
-  if(view.kind==="empty"||view.kind==="none"){
-    el.innerHTML=`<div class="empty fade"><span class="big" aria-hidden="true">${view.kind==="none"?"🫖":"🛋️"}</span><p>${t(view.kind)}</p></div>`; return;
-  }
-  if(view.kind==="msg"){ el.innerHTML=`<div class="empty fade"><span class="big" aria-hidden="true">${view.icon}</span><p>${esc(view.text)}</p></div>`; return; }
-  if(view.kind==="loading"){ el.innerHTML=`<div class="empty"><span class="big spin" aria-hidden="true">🎲</span><p>${t("loading")}</p></div>`; return; }
+  if(view.kind!=="item") applyTint(null);
+  if(view.kind==="empty"){ el.innerHTML=emptyBox("cup",t("empty")); return; }
+  if(view.kind==="none"){ el.innerHTML=emptyBox("search",t("none")); return; }
+  if(view.kind==="msg"){ el.innerHTML=emptyBox(view.icon,esc(view.text)); return; }
+  if(view.kind==="loading"){ el.innerHTML=`<div class="empty"><span class="big-ico spin">${ic("dice")}</span><p>${t("loading")}</p></div>`; return; }
   if(view.kind==="trio"){
-    el.innerHTML=`<div class="fade trio"><p class="trio-head">${t("pick3")}</p>${view.items.map((x,i)=>`
-      <button class="mini" data-i="${i}">${x.poster?`<img src="${IMG}w154${x.poster}" alt="" loading="lazy">`:`<span class="sw">🎬</span>`}
+    el.innerHTML=`<div class="fade trio">${relaxed?`<p class="relaxnote">${ic("search")} ${t("relaxed")}</p>`:""}<p class="trio-head">${t("pick3")}</p>${view.items.map((x,i)=>`
+      <button class="mini" data-i="${i}">${x.poster?`<img src="${IMG}w154${x.poster}" alt="" loading="lazy">`:`<span class="sw">${ic("film")}</span>`}
       <span><b>${esc(x.title)}</b><small>${x.type==="movie"?t("film"):t("serial")} · ${x.year||""}${x.vote?` · ★ ${x.vote.toFixed(1)}`:""}</small></span></button>`).join("")}</div>`;
     el.querySelectorAll(".mini").forEach(b=>b.onclick=()=>openItem(view.items[+b.dataset.i], view.items));
     return;
   }
   const {item,d}=view;
+  applyTint(d.poster_path);
   const title=d.title||d.name||item.title, orig=d.original_title||d.original_name||"";
   const year=(d.release_date||d.first_air_date||"").slice(0,4);
   const cc=(d.origin_country||[])[0]||(d.production_countries||[])[0]?.iso_3166_1||"";
@@ -664,37 +833,43 @@ function render(){
   const vids=(d.videos?.results||[]).filter(v=>v.site==="YouTube");
   const vid=vids.find(v=>v.type==="Trailer"&&v.iso_639_1===lang)||vids.find(v=>v.type==="Trailer")||vids.find(v=>v.type==="Teaser")||vids[0];
   const wp=(d["watch/providers"]?.results||{})[state.watch];
-  const flat=wp?.flatrate||[];
+  const allFlat=[...(wp?.flatrate||[]),...(wp?.free||[]),...(wp?.ads||[])].filter((p,i,a)=>a.findIndex(q=>q.provider_id===p.provider_id)===i);
+  const pop=allFlat.filter(isPopular);
+  const flat=pop.length?pop:allFlat.slice(0,3);
   const w=lists.watched.some(x=>keyOf(x)===keyOf(item)), l=lists.later.some(x=>keyOf(x)===keyOf(item));
-  const bg = d.backdrop_path ? `background-image:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),url(${IMG}w780${d.backdrop_path})` : "";
+  const img = d.backdrop_path||d.poster_path;
+  const bg = img ? `background-image:url(${IMG}${d.backdrop_path?"w780":"w500"}${img})` : "";
   el.innerHTML=`
     <div class="fade" style="display:flex;flex-direction:column;flex:1">
-      ${view.trio?`<button class="back" id="back">${t("back")}</button>`:""}
+      ${view.trio?`<button class="back" id="back">${ic("back")} ${t("back").replace(/^←\s*/,"")}</button>`:""}
       <div class="hero" style="${bg}">
         ${d.poster_path?`<img class="poster-img" src="${IMG}w342${d.poster_path}" alt="">`:""}
         <span class="tag">${item.type==="movie"?t("film"):t("serial")}</span>
       </div>
-      <h3 class="title">${esc(title)}</h3>
-      <p class="orig">${[orig&&orig!==title?esc(orig):"",year].filter(Boolean).join(" · ")}</p>
-      <div class="meta">
-        ${d.vote_average?`<span class="score">★ ${d.vote_average.toFixed(1)}</span>`:""}
-        ${cc?`<span>${flag(cc)} ${esc(cName(cc))}</span>`:""}
-        ${dur?`<span>⏱ ${dur}</span>`:""}
+      <div class="headline">
+        <h3 class="title">${esc(title)}</h3>
+        <p class="orig">${[orig&&orig!==title?esc(orig):"",year].filter(Boolean).join(" · ")}</p>
       </div>
+      <div class="meta">
+        ${d.vote_average?`<span class="score">${ic("star")} ${d.vote_average.toFixed(1)}</span>`:""}
+        ${cc?`<span>${flag(cc)} ${esc(cName(cc))}</span>`:""}
+        ${dur?`<span>${ic("clock")} ${dur}</span>`:""}
+      </div>
+      ${relaxed?`<p class="relaxnote">${ic("search")} ${t("relaxed")}</p>`:""}
       <p class="desc">${esc(d.overview||"")}${d._enOverview?`<span class="note">EN</span>`:""}</p>
       <div class="pills">${(d.genres||[]).map(g=>`<span class="pill">${esc(g.name)}</span>`).join("")}</div>
       <div class="where">
         <h4>${t("whereWatch")} · ${flag(state.watch)}</h4>
         ${flat.length?`<div class="plats">${flat.map(p=>`<span class="plat"><img class="plogo" src="${IMG}w92${p.logo_path}" alt=""> ${esc(p.provider_name)}</span>`).join("")}</div>`:`<p class="hint">${t("notStreaming")}</p>`}
-        ${wp?.link?`<a class="more" href="${wp.link}" target="_blank" rel="noopener">${t("more")} →</a>`:""}
+        ${wp?.link?`<a class="more more-link" href="${wp.link}" target="_blank" rel="noopener">${t("more")} ${ic("ext")}</a>`:""}
       </div>
       <div class="actions">
-        ${vid?`<button class="act trailer" id="tr">▶ ${t("trailer")}</button>`:`<a class="act trailer" href="https://www.youtube.com/results?search_query=${encodeURIComponent((item.orig||title)+" "+year+" trailer")}" target="_blank" rel="noopener">▶ ${t("trailer")}</a>`}
-        <button class="act" id="mw" aria-pressed="${w}">✓ ${t("markWatched")}</button>
-        <button class="act" id="ml" aria-pressed="${l}">☆ ${t("addLater")}</button>
+        ${vid?`<button class="act trailer" id="tr">${ic("play")} ${t("trailer")}</button>`:`<a class="act trailer" href="https://www.youtube.com/results?search_query=${encodeURIComponent((item.orig||title)+" "+year+" trailer")}" target="_blank" rel="noopener">${ic("play")} ${t("trailer")}</a>`}
+        <button class="act" id="mw" aria-pressed="${w}">${ic("check")} ${t("markWatched")}</button>
+        <button class="act" id="ml" aria-pressed="${l}">${ic(l?"bookmarkOn":"bookmark")} ${t("addLater")}</button>
       </div>
       <div style="height:16px"></div>
-      <button class="again" id="again">${t("again")}</button>
+      <button class="again" id="again">${ic("dice")} ${t("again")}</button>
     </div>`;
   const rec={id:item.id,type:item.type,title,year,poster:d.poster_path||item.poster};
   document.getElementById("again").onclick=()=>draw(1);
@@ -729,7 +904,7 @@ function renderLists(){
   const ul=document.getElementById("list"), arr=lists[listTab];
   if(!arr.length){ ul.innerHTML=`<li class="list-empty">${t("emptyList")}</li>`; return; }
   ul.innerHTML=arr.map((x,i)=>`<li><button class="open" data-i="${i}">${x.poster?`<img src="${IMG}w92${x.poster}" alt="">`:""}<span>${esc(x.title)} <small>${x.year||""}</small></span></button>
-    <button class="rm" data-i="${i}" aria-label="${t("remove")}">×</button></li>`).join("");
+    <button class="rm" data-i="${i}" aria-label="${t("remove")}">${ic("x")}</button></li>`).join("");
   ul.querySelectorAll(".open").forEach(b=>b.onclick=()=>{ openItem(arr[+b.dataset.i]);
     if(window.innerWidth<880) document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"}); });
   ul.querySelectorAll(".rm").forEach(b=>b.onclick=()=>{ arr.splice(+b.dataset.i,1); save(); renderLists(); if(view.kind==="item") render(); });
@@ -738,7 +913,7 @@ function renderLists(){
 /* ---------- Motyw i język ---------- */
 function setTheme(th){
   document.documentElement.dataset.theme=th;
-  document.getElementById("themeBtn").textContent = th==="dark" ? "☀️" : "🌙";
+  document.getElementById("themeBtn").innerHTML = ic(th==="dark" ? "sun" : "moon");
   try{ localStorage.setItem("tp-theme",th); }catch(e){}
 }
 function initTheme(){
@@ -750,14 +925,15 @@ function setPressed(sel, attr, val){ document.querySelectorAll(sel).forEach(b=>b
 function applyLang(){
   try{ regionNames=new Intl.DisplayNames([lang],{type:"region"}); }catch(e){ regionNames={of:c=>c}; }
   document.documentElement.lang=lang;
+  document.querySelectorAll(".ico-slot").forEach(el=>el.innerHTML=ic(el.dataset.ico));
   document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
   document.getElementById("filters").setAttribute("aria-label",t("filters"));
   document.getElementById("themeBtn").setAttribute("aria-label",t("theme"));
-  document.querySelector("#modal .close").setAttribute("aria-label",t("close"));
+  document.querySelector("#modal .close").setAttribute("aria-label",t("close")); document.querySelector("#modal .close").innerHTML=ic("x");
   document.getElementById("langSel").value=lang;
   renderChips(); renderLists();
   if(view.kind==="item"){ openItem(view.item, view.trio); } else render();
-  if(!KEY){ view={kind:"msg",text:t("noKey"),icon:"🔑"}; render(); }
+  if(!KEY){ view={kind:"msg",text:t("noKey"),icon:"key"}; render(); }
 }
 
 /* ---------- Zdarzenia ---------- */
