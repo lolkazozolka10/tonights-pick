@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tonight’s Pick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F0E6;
+    --card:#FFFBF5;
+    --ink:#3A2F29;
+    --muted:#8A7B70;
+    --line:#E8DDCD;
+    --accent:#C7785B;
+    --accent-dark:#A9603F;
+    --accent-soft:#F3DED2;
+    --sage:#7F9B83;
+    --sage-soft:#E1EADF;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(58,47,41,.04),0 8px 24px rgba(58,47,41,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"DM Sans",system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 20px 56px}
+  .topbar{display:flex;justify-content:flex-end;margin:-16px 0 8px}
+  header{text-align:center;margin-bottom:32px}
+  header .mark{font-size:30px;display:block;margin-bottom:6px}
+  h1{
+    font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:clamp(30px,5vw,44px);letter-spacing:-.01em;margin:0 0 6px;
+  }
+  header p{margin:0;color:var(--muted);font-size:16px}
+
+  .layout{display:grid;gap:20px;grid-template-columns:1fr}
+  @media (min-width:880px){
+    .layout{grid-template-columns:1.1fr .9fr;align-items:start}
+    .result-col{position:sticky;top:24px}
+  }
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:24px;
+  }
+  .group{padding:4px 0 18px}
+  .group + .group{border-top:1px dashed var(--line);padding-top:18px}
+  .group-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;gap:8px}
+  .group h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+  .hint{font-size:12.5px;color:var(--muted)}
+  .clear{background:none;border:0;color:var(--accent-dark);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
+  .clear:hover{text-decoration:underline}
+
+  .segment{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg);border-radius:14px;padding:4px;gap:4px}
+  .segment button{
+    border:0;background:transparent;border-radius:11px;padding:10px 8px;
+    font:inherit;font-weight:500;color:var(--ink);cursor:pointer;transition:background .2s,box-shadow .2s;
+  }
+  .segment button[aria-pressed="true"]{background:var(--card);box-shadow:0 1px 4px rgba(58,47,41,.12)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:7px 14px;font:inherit;font-size:14.5px;cursor:pointer;
+    transition:background .15s,border-color .15s,color .15s;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .chip:hover{border-color:#D7C7B2}
+  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dark)}
+  .chip small{color:var(--muted);font-size:12px}
+  .chip[aria-pressed="true"] small{color:var(--accent-dark);opacity:.8}
+
+  .draw{
+    width:100%;margin-top:8px;border:0;border-radius:14px;
+    background:var(--accent);color:#fff;font:inherit;font-weight:600;font-size:17px;
+    padding:16px;cursor:pointer;transition:background .2s,transform .1s;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .draw:hover{background:var(--accent-dark)}
+  .draw:active{transform:scale(.99)}
+  .count{text-align:center;color:var(--muted);font-size:13.5px;margin-top:10px}
+
+  /* Result */
+  .result{min-height:320px;display:flex;flex-direction:column}
+  .empty{margin:auto;text-align:center;color:var(--muted);padding:24px 8px}
+  .empty .big{font-size:44px;display:block;margin-bottom:10px}
+  .empty p{margin:0 auto;max-width:280px}
+  .poster{
+    border-radius:14px;aspect-ratio:16/8;margin-bottom:18px;
+    display:flex;align-items:flex-end;padding:16px;position:relative;overflow:hidden;
+  }
+  .poster .tag{
+    background:rgba(255,251,245,.9);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600;
+  }
+  .poster .emoji{position:absolute;right:18px;top:12px;font-size:46px;opacity:.9}
+  .title{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:28px;line-height:1.15;margin:0}
+  .orig{color:var(--muted);font-size:14.5px;margin:4px 0 14px}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14.5px;margin-bottom:14px}
+  .meta span{display:inline-flex;align-items:center;gap:6px}
+  .desc{margin:0 0 16px;font-size:15.5px}
+  .pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+  .pill{font-size:12.5px;border-radius:999px;padding:4px 10px;background:var(--sage-soft);color:#4E6853}
+  .pill.plat{background:var(--accent-soft);color:var(--accent-dark)}
+  .again{
+    margin-top:auto;border:1px solid var(--line);background:transparent;border-radius:12px;
+    padding:12px;font:inherit;font-weight:500;color:var(--ink);cursor:pointer;width:100%;
+  }
+  .again:hover{background:var(--bg)}
+  .fade{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .shuffle .title{opacity:.45}
+
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:28px}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (max-width:520px){
+    .wrap{padding:28px 14px 40px}
+    .card{padding:18px}
+    .chip{padding:7px 12px;font-size:14px}
+    .title{font-size:24px}
+  }
+  .lang-sel{appearance:none;-webkit-appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A7B70' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border:1px solid var(--line);border-radius:999px;padding:7px 32px 7px 14px;font:inherit;font-size:14px;font-weight:500;color:var(--ink);cursor:pointer}
+  .lang-wrap{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:15px}
+  .segment.two{grid-template-columns:repeat(2,1fr)}
+  .logo{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 4px;border-radius:6px;color:#fff;font-size:10px;font-weight:700;letter-spacing:-.02em;line-height:1;font-family:"DM Sans",sans-serif;text-transform:none}
+  .plats{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .plat{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;background:var(--bg);border-radius:999px;padding:4px 10px 4px 4px}
+  .note{display:block;font-size:12px;color:var(--muted);margin-top:4px;font-style:italic}
+  /* ---- tryb ciemny ---- */
+  html[data-theme="dark"]{
+    --bg:#1F1A17; --card:#2A2420; --ink:#F1E8DE; --muted:#A89A8E; --line:#3D352F;
+    --accent:#D88B6C; --accent-dark:#E9A386; --accent-soft:#4A3329; --sage-soft:#2F3A30;
+    --shadow:0 1px 2px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.25);
+  }
+  html[data-theme="dark"] .pill{color:#B8CDB9}
+  html[data-theme="dark"] .poster .tag{background:rgba(42,36,32,.85);color:var(--ink)}
+  html[data-theme="dark"] .poster{filter:saturate(.85) brightness(.82)}
+  html[data-theme="dark"] .segment button[aria-pressed="true"]{background:#3A322C}
+  html[data-theme="dark"] .draw{color:#1F1A17}
+  body{transition:background .3s,color .3s}
+  .topbar{gap:8px;align-items:center}
+  .icon-btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;width:36px;height:36px;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  .draw-row{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-top:8px}
+  .draw-row .draw{margin-top:0}
+  .draw.alt{background:transparent;border:1.5px solid var(--accent);color:var(--accent-dark)}
+  .draw.alt:hover{background:var(--accent-soft)}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .act{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer;text-decoration:none}
+  .act:hover{background:var(--bg)}
+  .act[aria-pressed="true"]{background:var(--sage-soft);border-color:#9FB8A2}
+  .act.trailer{background:var(--accent-soft);border-color:transparent;color:var(--accent-dark);font-weight:600}
+  .trio{display:grid;gap:10px}
+  .trio-head{font-size:13px;color:var(--muted);margin:0 0 4px}
+  .mini{display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px;cursor:pointer;font:inherit;color:var(--ink);width:100%}
+  .mini:hover{border-color:var(--accent)}
+  .mini .sw{width:54px;height:54px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .mini b{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:17px;display:block;line-height:1.2}
+  .mini small{color:var(--muted);font-size:12.5px}
+  .back{background:none;border:0;color:var(--accent-dark);font:inherit;font-size:13.5px;cursor:pointer;padding:0;margin-bottom:10px;align-self:flex-start}
+  .lists{margin-top:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tabs button{border:0;background:var(--bg);color:var(--muted);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+  .tabs button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-dark)}
+  .list{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto}
+  .list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .list li:last-child{border-bottom:0}
+  .list .open{background:none;border:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer;padding:0}
+  .list .open:hover{color:var(--accent-dark)}
+  .list .rm{background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px}
+  .list-empty{color:var(--muted);font-size:14px;margin:4px 0}
+  .toggle-chip{font-weight:500}
+  @media (max-width:520px){.draw-row{grid-template-columns:1fr 1fr}}
+
+  .hero{position:relative;border-radius:14px;aspect-ratio:16/9;margin-bottom:18px;background:linear-gradient(135deg,var(--accent-soft),var(--sage-soft));background-size:cover;background-position:center;overflow:hidden}
+  .hero .poster-img{position:absolute;left:14px;bottom:14px;width:28%;max-width:120px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .hero .tag{position:absolute;right:14px;bottom:14px;background:rgba(255,251,245,.92);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600;color:#3A2F29}
+  .plogo{width:22px;height:22px;border-radius:6px;object-fit:cover;flex:none}
+  .chip .plogo{width:20px;height:20px}
+  .score{font-weight:600;color:var(--accent-dark)}
+  .where{background:var(--bg);border-radius:12px;padding:12px 14px;margin-top:12px}
+  .where h4{margin:0 0 8px;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .where .plats{margin-top:0}
+  .where .plat{background:var(--card)}
+  .more{display:inline-block;margin-top:8px;font-size:13.5px;color:var(--accent-dark);text-decoration:none}
+  .more:hover{text-decoration:underline}
+  .hint{color:var(--muted);font-size:13.5px;margin:0}
+  .mini img{width:46px;height:69px;object-fit:cover;border-radius:8px;flex:none}
+  .list .open{display:flex;align-items:center;gap:10px}
+  .list .open img{width:30px;height:45px;object-fit:cover;border-radius:5px}
+  .list small{color:var(--muted)}
+  .spin{display:inline-block;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .select-sel{appearance:none;-webkit-appearance:none;width:100%;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A7B70' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 14px center;border:1px solid var(--line);border-radius:12px;padding:10px 36px 10px 14px;font:inherit;color:var(--ink);cursor:pointer}
+  .modal{position:fixed;inset:0;background:rgba(20,15,12,.75);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+  .modal[hidden]{display:none}
+  .modal .box{width:min(960px,100%);position:relative}
+  .modal .frame{aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden}
+  .modal iframe{width:100%;height:100%;border:0}
+  .modal .close{position:absolute;top:-44px;right:0;background:var(--card);color:var(--ink);border:0;border-radius:999px;width:36px;height:36px;font-size:18px;cursor:pointer}
+  html[data-theme="dark"] .hero .tag{background:rgba(42,36,32,.9);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <label class="lang-wrap"><span aria-hidden="true">🌍</span><select id="langSel" class="lang-sel" aria-label="Language"></select></label>
+    <button class="icon-btn" id="themeBtn" type="button">🌙</button>
+  </div>
+  <header>
+    <span class="mark" aria-hidden="true">🍿</span>
+    <h1>Tonight’s Pick</h1>
+    <p data-i18n="subtitle"></p>
+  </header>
+  <div class="layout">
+    <section class="card" id="filters">
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hType"></h2></div>
+        <div class="segment" id="type">
+          <button data-v="any" data-i18n="any"></button>
+          <button data-v="movie" data-i18n="film"></button>
+          <button data-v="tv" data-i18n="serial"></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hWatch"></h2><span class="hint" data-i18n="watchHint"></span></div>
+        <select id="watchSel" class="select-sel" aria-label="Country"></select>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hPlat"></h2><button class="clear" data-clear="plat" data-i18n="clear"></button></div>
+        <div class="chips" id="plat"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hRegion"></h2></div>
+        <div class="segment two" id="region">
+          <button data-v="eu"><span aria-hidden="true">🇪🇺</span> <span data-i18n="europe"></span></button>
+          <button data-v="world"><span aria-hidden="true">🌎</span> <span data-i18n="world"></span></button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hMood"></h2><button class="clear" data-clear="mood" data-i18n="clear"></button></div>
+        <div class="chips" id="mood"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hLen"></h2><button class="clear" data-clear="len" data-i18n="clear"></button></div>
+        <div class="chips" id="len"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hGenre"></h2><button class="clear" data-clear="genre" data-i18n="clear"></button></div>
+        <div class="chips" id="genre"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hRating"></h2><button class="clear" data-clear="rating" data-i18n="clear"></button></div>
+        <div class="chips" id="rating"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hEra"></h2><button class="clear" data-clear="era" data-i18n="clear"></button></div>
+        <div class="chips" id="era"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hCountry"></h2><button class="clear" data-clear="country" data-i18n="clear"></button></div>
+        <div class="chips" id="country"></div>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hExtra"></h2></div>
+        <div class="chips" id="opts"></div>
+      </div>
+      <div class="draw-row">
+        <button class="draw" id="draw"><span aria-hidden="true">🎲</span> <span data-i18n="draw"></span></button>
+        <button class="draw alt" id="draw3"><span data-i18n="draw3"></span></button>
+      </div>
+      <div class="count" id="count"></div>
+    </section>
+    <div class="result-col">
+      <section class="card result" id="result" aria-live="polite"></section>
+      <section class="card lists">
+        <div class="group-head"><h2 data-i18n="listsTitle"></h2></div>
+        <div class="tabs" id="tabs"><button data-tab="later"></button><button data-tab="watched"></button></div>
+        <ul class="list" id="list"></ul>
+      </section>
+    </div>
+  </div>
+  <footer><span data-i18n="footer"></span> <a href="https://www.themoviedb.org/" target="_blank" rel="noopener" style="color:inherit">themoviedb.org</a></footer>
+</div>
+<div class="modal" id="modal" hidden><div class="box"><button class="close" type="button">×</button><div class="frame"></div></div></div>
+<script src="config.js"></script>
+<script>
+/* =========================================================
+   Tonight's Pick — wersja z TMDB
+   Klucz API: plik config.js →  window.TMDB_KEY = "...";
+   ========================================================= */
+const KEY = (window.TMDB_KEY || "").trim();
+const API = "https://api.themoviedb.org/3";
+const IMG = "https://image.tmdb.org/t/p/";
+
+const EUROPE = "PL FR DE ES IT GB IE SE DK NO FI IS NL BE AT CH PT GR HU CZ SK RO BG HR SI RS UA LT LV EE".split(" ");
+const WORLD_EXTRA = "US CA MX BR AR CO CL JP KR CN HK TW IN IR TR IL TH PH AU NZ ZA NG EG".split(" ");
+const WATCH_COUNTRIES = "SE PL NO DK FI DE GB IE FR ES IT NL BE AT CH PT GR HU CZ RO US CA AU".split(" ");
+
+const GENRES = {           // [film, serial]
+  action:[28,10759], adventure:[12,10759], animation:[16,16], comedy:[35,35], crime:[80,80],
+  documentary:[99,99], drama:[18,18], family:[10751,10751], fantasy:[14,10765], history:[36,null],
+  horror:[27,null], music:[10402,null], mystery:[9648,9648], romance:[10749,null], scifi:[878,10765],
+  thriller:[53,9648], war:[10752,10768]
+};
+const GENRE_KEYS = Object.keys(GENRES);
+const GENRE_EMOJI = {action:"💥",adventure:"🧭",animation:"🎨",comedy:"😄",crime:"🔍",documentary:"🎥",drama:"🎭",family:"🧸",fantasy:"🐉",history:"📜",horror:"🕯️",music:"🎵",mystery:"🗝️",romance:"💌",scifi:"🪐",thriller:"🌒",war:"🎖️"};
+const MOODS = "LHCTMZ".split("");
+const MOOD_EMOJI = {L:"☀️",H:"😊",C:"🥹",T:"⚡",M:"💭",Z:"🧣"};
+const MOOD_GENRES = {L:["comedy","family","animation","romance","adventure"],H:["comedy","family","music","romance"],C:["drama","romance"],T:["thriller","crime","horror","mystery","action"],M:["drama","documentary","history","scifi"],Z:["family","animation","fantasy","romance","comedy"]};
+const ERAS = [{v:"a",l:"< 2000",from:"1900-01-01",to:"1999-12-31"},{v:"b",l:"2000–2014",from:"2000-01-01",to:"2014-12-31"},{v:"c",l:"2015–2022",from:"2015-01-01",to:"2022-12-31"},{v:"d",l:"2023+",from:"2023-01-01",to:"2099-12-31"}];
+const RATINGS = [6,7,8];
+const LANGS = [["pl","Polski","pl-PL"],["en","English","en-US"],["sv","Svenska","sv-SE"],["de","Deutsch","de-DE"],["fr","Français","fr-FR"],["es","Español","es-ES"]];
+
+const GENRE_NAMES = {
+  pl:"akcja,przygodowy,animacja,komedia,kryminał,dokumentalny,dramat,familijny,fantasy,historyczny,horror,muzyczny,tajemnica,romans,sci-fi,thriller,wojenny",
+  en:"action,adventure,animation,comedy,crime,documentary,drama,family,fantasy,history,horror,music,mystery,romance,sci-fi,thriller,war",
+  sv:"action,äventyr,animerat,komedi,kriminal,dokumentär,drama,familj,fantasy,historiskt,skräck,musik,mysterium,romantik,sci-fi,thriller,krig",
+  de:"Action,Abenteuer,Animation,Komödie,Krimi,Doku,Drama,Familie,Fantasy,Historie,Horror,Musik,Mystery,Romanze,Sci-Fi,Thriller,Krieg",
+  fr:"action,aventure,animation,comédie,policier,documentaire,drame,famille,fantasy,historique,horreur,musique,mystère,romance,science-fiction,thriller,guerre",
+  es:"acción,aventura,animación,comedia,policíaco,documental,drama,familiar,fantasía,histórico,terror,musical,misterio,romance,ciencia ficción,thriller,bélico"
+};
+const MOOD_NAMES = {
+  pl:["Lekko i przyjemnie","Na poprawę humoru","Do wzruszeń","Trzyma w napięciu","Do przemyślenia","Przytulnie"],
+  en:["Light & easy","Feel-good","Tearjerker","Edge of your seat","Thought-provoking","Cosy"],
+  sv:["Lätt och skönt","Må bra","Att gråta till","Spännande","Tankeväckande","Mysigt"],
+  de:["Leicht & entspannt","Gute Laune","Zum Weinen","Spannend","Zum Nachdenken","Gemütlich"],
+  fr:["Léger","Bonne humeur","Émouvant","Haletant","Qui fait réfléchir","Cocooning"],
+  es:["Ligero","Para animarse","Para llorar","Trepidante","Para pensar","Acogedor"]
+};
+
+const I18N = {
+  pl:{subtitle:"Wybierz, na co masz ochotę, a my wylosujemy coś do obejrzenia.",hType:"Rodzaj",any:"Obojętnie",film:"Film",serial:"Serial",
+    hWatch:"Oglądam w kraju",watchHint:"Od tego zależą platformy i dostępność.",hRegion:"Skąd pochodzi",europe:"Tylko Europa",world:"Cały świat",
+    hMood:"Nastrój",hLen:"Długość",hPlat:"Moje platformy",hGenre:"Kategoria",hEra:"Epoka",hRating:"Minimalna ocena",hCountry:"Kraj produkcji",hExtra:"Dodatkowo",
+    kids:"Dla dzieci",skipWatched:"Pomiń obejrzane",onlyNew:"Tylko nowości",clear:"wyczyść",draw:"Losuj",draw3:"Losuj 3",again:"Wylosuj coś innego",
+    trailer:"Zwiastun",markWatched:"Obejrzane",addLater:"Na później",listsTitle:"Moje listy",watched:"Obejrzane",later:"Na później",emptyList:"Na razie pusto.",
+    pick3:"Trzy propozycje — wybierz jedną:",back:"← wróć do trzech propozycji",theme:"Zmień motyw",remove:"Usuń",close:"Zamknij",
+    empty:"Zaparz herbatę, wybierz filtry i kliknij „Losuj”. Puste pole oznacza „wszystko jedno”.",
+    none:"Żaden tytuł nie spełnia wszystkich warunków. Odznacz jedną lub dwie opcje i spróbuj jeszcze raz.",
+    loading:"Szukam czegoś dobrego…",error:"Nie udało się połączyć z TMDB. Sprawdź internet i spróbuj ponownie.",badKey:"TMDB nie przyjmuje klucza API. Sprawdź, czy w pliku config.js jest wklejony poprawny klucz.",
+    noKey:"Brakuje klucza TMDB. Dodaj plik config.js z kluczem API (instrukcja jest w rozmowie z Claude).",
+    whereWatch:"Gdzie obejrzeć",notStreaming:"W tym kraju nie ma go w abonamentach — sprawdź wypożyczenie.",more:"Więcej opcji",
+    seasons:n=>`${n} ${n===1?"sezon":(n%10>=2&&n%10<=4&&!(n%100>=12&&n%100<=14))?"sezony":"sezonów"}`,
+    found:n=>`Pasujących tytułów: ${n.toLocaleString("pl")}`,platLoading:"Ładuję platformy…",
+    short:"Krótko",mid:"Średnio",long:"Długo",fS:"do 100 min",fM:"100–130 min",fL:"ponad 130 min",sS:"odc. do 35 min",sM:"odc. 35–55 min",sL:"odc. ponad 55 min",
+    perEp:"min / odcinek",filters:"Filtry",footer:"Dane i zdjęcia: TMDB. Ten produkt korzysta z API TMDB, ale nie jest przez TMDB wspierany ani certyfikowany. Dane o platformach: JustWatch."},
+  en:{subtitle:"Pick what you're in the mood for and we'll draw something to watch.",hType:"Type",any:"Any",film:"Film",serial:"Series",
+    hWatch:"I watch in",watchHint:"This sets the platforms and availability.",hRegion:"Made in",europe:"Europe only",world:"Whole world",
+    hMood:"Mood",hLen:"Length",hPlat:"My platforms",hGenre:"Genre",hEra:"Era",hRating:"Minimum rating",hCountry:"Country of origin",hExtra:"Extras",
+    kids:"For kids",skipWatched:"Skip watched",onlyNew:"New releases only",clear:"clear",draw:"Draw",draw3:"Draw 3",again:"Draw something else",
+    trailer:"Trailer",markWatched:"Watched",addLater:"Watch later",listsTitle:"My lists",watched:"Watched",later:"Watch later",emptyList:"Nothing here yet.",
+    pick3:"Three picks — choose one:",back:"← back to three picks",theme:"Switch theme",remove:"Remove",close:"Close",
+    empty:"Make a cup of tea, choose your filters and press “Draw”. An empty section means “anything goes”.",
+    none:"No title matches all your choices. Untick an option or two and try again.",
+    loading:"Looking for something good…",error:"Couldn't reach TMDB. Check your connection and try again.",badKey:"TMDB rejected the API key. Check that config.js contains a valid key.",
+    noKey:"The TMDB key is missing. Add a config.js file with your API key.",
+    whereWatch:"Where to watch",notStreaming:"Not on subscription services in this country — try renting.",more:"More options",
+    seasons:n=>`${n} season${n===1?"":"s"}`,found:n=>`Matching titles: ${n.toLocaleString("en")}`,platLoading:"Loading platforms…",
+    short:"Short",mid:"Medium",long:"Long",fS:"up to 100 min",fM:"100–130 min",fL:"over 130 min",sS:"ep. up to 35 min",sM:"ep. 35–55 min",sL:"ep. over 55 min",
+    perEp:"min / episode",filters:"Filters",footer:"Data and images: TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB. Streaming data: JustWatch."},
+  sv:{subtitle:"Välj vad du är sugen på, så lottar vi fram något att titta på.",hType:"Typ",any:"Spelar ingen roll",film:"Film",serial:"Serie",
+    hWatch:"Jag tittar i",watchHint:"Styr vilka tjänster och titlar som finns.",hRegion:"Gjord i",europe:"Bara Europa",world:"Hela världen",
+    hMood:"Stämning",hLen:"Längd",hPlat:"Mina tjänster",hGenre:"Genre",hEra:"Epok",hRating:"Lägsta betyg",hCountry:"Produktionsland",hExtra:"Extra",
+    kids:"För barn",skipWatched:"Hoppa över sedda",onlyNew:"Bara nyheter",clear:"rensa",draw:"Lotta",draw3:"Lotta 3",again:"Lotta något annat",
+    trailer:"Trailer",markWatched:"Sedd",addLater:"Se senare",listsTitle:"Mina listor",watched:"Sedda",later:"Se senare",emptyList:"Tomt än så länge.",
+    pick3:"Tre förslag — välj ett:",back:"← tillbaka till tre förslag",theme:"Byt tema",remove:"Ta bort",close:"Stäng",
+    empty:"Brygg en kopp te, välj filter och tryck på ”Lotta”. Ett tomt fält betyder ”vad som helst”.",
+    none:"Ingen titel matchar alla val. Avmarkera något och försök igen.",
+    loading:"Letar efter något bra…",error:"Kunde inte nå TMDB. Kontrollera anslutningen och försök igen.",badKey:"TMDB godkände inte API-nyckeln. Kontrollera config.js.",
+    noKey:"TMDB-nyckeln saknas. Lägg till filen config.js med din API-nyckel.",
+    whereWatch:"Var kan jag se den",notStreaming:"Finns inte på streamingtjänster i det här landet — prova att hyra.",more:"Fler alternativ",
+    seasons:n=>`${n} ${n===1?"säsong":"säsonger"}`,found:n=>`Matchande titlar: ${n.toLocaleString("sv")}`,platLoading:"Laddar tjänster…",
+    short:"Kort",mid:"Mellan",long:"Lång",fS:"upp till 100 min",fM:"100–130 min",fL:"över 130 min",sS:"avsn. upp till 35 min",sM:"avsn. 35–55 min",sL:"avsn. över 55 min",
+    perEp:"min / avsnitt",filters:"Filter",footer:"Data och bilder: TMDB. Denna produkt använder TMDB:s API men är inte godkänd eller certifierad av TMDB. Streamingdata: JustWatch."},
+  de:{subtitle:"Wähle, worauf du Lust hast, und wir losen etwas für dich aus.",hType:"Art",any:"Egal",film:"Film",serial:"Serie",
+    hWatch:"Ich schaue in",watchHint:"Bestimmt Dienste und Verfügbarkeit.",hRegion:"Herkunft",europe:"Nur Europa",world:"Ganze Welt",
+    hMood:"Stimmung",hLen:"Länge",hPlat:"Meine Dienste",hGenre:"Genre",hEra:"Epoche",hRating:"Mindestbewertung",hCountry:"Produktionsland",hExtra:"Extras",
+    kids:"Für Kinder",skipWatched:"Gesehenes überspringen",onlyNew:"Nur Neuheiten",clear:"leeren",draw:"Auslosen",draw3:"3 auslosen",again:"Etwas anderes auslosen",
+    trailer:"Trailer",markWatched:"Gesehen",addLater:"Später ansehen",listsTitle:"Meine Listen",watched:"Gesehen",later:"Später",emptyList:"Noch leer.",
+    pick3:"Drei Vorschläge — wähle einen:",back:"← zurück zu den drei Vorschlägen",theme:"Design wechseln",remove:"Entfernen",close:"Schließen",
+    empty:"Koch dir einen Tee, wähle Filter und tippe auf „Auslosen“. Ein leerer Bereich heißt „alles egal“.",
+    none:"Kein Titel passt zu allen Kriterien. Entferne ein, zwei Optionen und versuch es nochmal.",
+    loading:"Suche etwas Gutes…",error:"TMDB ist nicht erreichbar. Prüfe die Verbindung und versuch es erneut.",badKey:"TMDB hat den API-Schlüssel abgelehnt. Prüfe config.js.",
+    noKey:"Der TMDB-Schlüssel fehlt. Füge eine config.js mit deinem API-Schlüssel hinzu.",
+    whereWatch:"Wo ansehen",notStreaming:"In diesem Land nicht im Abo — versuch es mit Leihen.",more:"Mehr Optionen",
+    seasons:n=>`${n} ${n===1?"Staffel":"Staffeln"}`,found:n=>`Passende Titel: ${n.toLocaleString("de")}`,platLoading:"Lade Dienste…",
+    short:"Kurz",mid:"Mittel",long:"Lang",fS:"bis 100 Min.",fM:"100–130 Min.",fL:"über 130 Min.",sS:"Folge bis 35 Min.",sM:"Folge 35–55 Min.",sL:"Folge über 55 Min.",
+    perEp:"Min. / Folge",filters:"Filter",footer:"Daten und Bilder: TMDB. Dieses Produkt nutzt die TMDB-API, ist aber nicht von TMDB unterstützt oder zertifiziert. Streaming-Daten: JustWatch."},
+  fr:{subtitle:"Choisis ce qui te fait envie, et on tire au sort quelque chose à regarder.",hType:"Type",any:"Peu importe",film:"Film",serial:"Série",
+    hWatch:"Je regarde en/au",watchHint:"Définit les plateformes et la disponibilité.",hRegion:"Origine",europe:"Europe seulement",world:"Monde entier",
+    hMood:"Humeur",hLen:"Durée",hPlat:"Mes plateformes",hGenre:"Genre",hEra:"Époque",hRating:"Note minimale",hCountry:"Pays de production",hExtra:"Options",
+    kids:"Pour enfants",skipWatched:"Ignorer les vus",onlyNew:"Nouveautés seulement",clear:"effacer",draw:"Tirer au sort",draw3:"Tirer 3",again:"Tirer autre chose",
+    trailer:"Bande-annonce",markWatched:"Vu",addLater:"À voir plus tard",listsTitle:"Mes listes",watched:"Vus",later:"Plus tard",emptyList:"Rien pour l’instant.",
+    pick3:"Trois idées — choisis-en une :",back:"← retour aux trois idées",theme:"Changer de thème",remove:"Retirer",close:"Fermer",
+    empty:"Prépare un thé, choisis tes filtres et appuie sur « Tirer au sort ». Une rubrique vide veut dire « peu importe ».",
+    none:"Aucun titre ne correspond à tous les critères. Retire une ou deux options et réessaie.",
+    loading:"Je cherche quelque chose de bien…",error:"Impossible de joindre TMDB. Vérifie ta connexion et réessaie.",badKey:"TMDB a refusé la clé API. Vérifie config.js.",
+    noKey:"La clé TMDB manque. Ajoute un fichier config.js avec ta clé API.",
+    whereWatch:"Où regarder",notStreaming:"Pas en abonnement dans ce pays — essaie la location.",more:"Plus d’options",
+    seasons:n=>`${n} saison${n===1?"":"s"}`,found:n=>`Titres correspondants : ${n.toLocaleString("fr")}`,platLoading:"Chargement des plateformes…",
+    short:"Court",mid:"Moyen",long:"Long",fS:"jusqu’à 100 min",fM:"100–130 min",fL:"plus de 130 min",sS:"ép. jusqu’à 35 min",sM:"ép. 35–55 min",sL:"ép. plus de 55 min",
+    perEp:"min / épisode",filters:"Filtres",footer:"Données et images : TMDB. Ce produit utilise l’API TMDB mais n’est ni approuvé ni certifié par TMDB. Données de streaming : JustWatch."},
+  es:{subtitle:"Elige lo que te apetece y sortearemos algo para ver.",hType:"Tipo",any:"Da igual",film:"Película",serial:"Serie",
+    hWatch:"Veo desde",watchHint:"Define las plataformas y la disponibilidad.",hRegion:"Origen",europe:"Solo Europa",world:"Todo el mundo",
+    hMood:"Estado de ánimo",hLen:"Duración",hPlat:"Mis plataformas",hGenre:"Género",hEra:"Época",hRating:"Nota mínima",hCountry:"País de producción",hExtra:"Extras",
+    kids:"Para niños",skipWatched:"Omitir vistos",onlyNew:"Solo novedades",clear:"borrar",draw:"Sortear",draw3:"Sortear 3",again:"Sortear otra cosa",
+    trailer:"Tráiler",markWatched:"Visto",addLater:"Ver después",listsTitle:"Mis listas",watched:"Vistos",later:"Ver después",emptyList:"Aún vacío.",
+    pick3:"Tres propuestas — elige una:",back:"← volver a las tres propuestas",theme:"Cambiar tema",remove:"Quitar",close:"Cerrar",
+    empty:"Prepárate un té, elige los filtros y pulsa «Sortear». Una sección vacía significa «cualquiera».",
+    none:"Ningún título cumple todos los criterios. Quita una o dos opciones y vuelve a intentarlo.",
+    loading:"Buscando algo bueno…",error:"No se pudo conectar con TMDB. Revisa la conexión e inténtalo de nuevo.",badKey:"TMDB rechazó la clave API. Revisa config.js.",
+    noKey:"Falta la clave de TMDB. Añade un archivo config.js con tu clave API.",
+    whereWatch:"Dónde verla",notStreaming:"No está en suscripción en este país — prueba a alquilarla.",more:"Más opciones",
+    seasons:n=>`${n} temporada${n===1?"":"s"}`,found:n=>`Títulos que coinciden: ${n.toLocaleString("es")}`,platLoading:"Cargando plataformas…",
+    short:"Corta",mid:"Media",long:"Larga",fS:"hasta 100 min",fM:"100–130 min",fL:"más de 130 min",sS:"ep. hasta 35 min",sM:"ep. 35–55 min",sL:"ep. más de 55 min",
+    perEp:"min / episodio",filters:"Filtros",footer:"Datos e imágenes: TMDB. Este producto usa la API de TMDB pero no está respaldado ni certificado por TMDB. Datos de streaming: JustWatch."}
+};
+
+/* ---------- Stan ---------- */
+let lang = "pl";
+const state = {type:"any", region:"eu", watch:"SE", rating:0, len:new Set(), plat:new Set(), country:new Set(), genre:new Set(), mood:new Set(), era:new Set(), opts:new Set()};
+const SETS = ["len","plat","country","genre","mood","era","opts"];
+let lists = {watched:[], later:[]};       // {id,type,title,year,poster}
+let listTab = "later";
+let view = {kind:"empty"}, lastKey = null;
+const providerCache = {}, detailCache = {};
+
+const t = k => I18N[lang][k];
+const tmdbLang = () => LANGS.find(l=>l[0]===lang)[2];
+const esc = s => String(s??"").replace(/[&<>"]/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const gName = g => GENRE_NAMES[lang].split(",")[GENRE_KEYS.indexOf(g)];
+const mName = m => MOOD_NAMES[lang][MOODS.indexOf(m)];
+let regionNames = null;
+const cName = cc => { try{ return regionNames.of(cc); }catch(e){ return cc; } };
+const flag = cc => cc && cc.length===2 ? String.fromCodePoint(...[...cc].map(c=>127397+c.charCodeAt(0))) : "";
+const keyOf = x => `${x.type}:${x.id}`;
+
+function save(){
+  try{
+    const o={lang,type:state.type,region:state.region,watch:state.watch,rating:state.rating,lists};
+    SETS.forEach(k=>o[k]=[...state[k]]);
+    localStorage.setItem("tp-tmdb",JSON.stringify(o));
+  }catch(e){}
+}
+function guessWatch(){
+  const tz=(Intl.DateTimeFormat().resolvedOptions().timeZone||"");
+  const m={Stockholm:"SE",Warsaw:"PL",Oslo:"NO",Copenhagen:"DK",Helsinki:"FI",Berlin:"DE",London:"GB",Dublin:"IE",Paris:"FR",Madrid:"ES",Rome:"IT",Amsterdam:"NL",Brussels:"BE",Vienna:"AT",Zurich:"CH",Lisbon:"PT",Athens:"GR",Budapest:"HU",Prague:"CZ",Bucharest:"RO"};
+  for(const c in m) if(tz.includes(c)) return m[c];
+  return "GB";
+}
+function load(){
+  state.watch=guessWatch();
+  try{
+    const s=JSON.parse(localStorage.getItem("tp-tmdb")||"null");
+    if(s){
+      state.type=s.type||"any"; state.region=s.region||"eu"; state.watch=s.watch||state.watch; state.rating=s.rating||0;
+      SETS.forEach(k=>state[k]=new Set(s[k]||[]));
+      if(s.lists) lists={watched:s.lists.watched||[],later:s.lists.later||[]};
+      if(I18N[s.lang]){ lang=s.lang; return; }
+    }
+  }catch(e){}
+  const nav=(navigator.language||"en").slice(0,2).toLowerCase();
+  lang=I18N[nav]?nav:"en";
+}
+
+/* ---------- TMDB ---------- */
+async function tmdb(path, params={}){
+  const u=new URL(API+path);
+  const headers={accept:"application/json"};
+  if(KEY.startsWith("eyJ")) headers.Authorization="Bearer "+KEY; else u.searchParams.set("api_key",KEY);
+  for(const k in params) if(params[k]!==undefined && params[k]!=="") u.searchParams.set(k,params[k]);
+  const r=await fetch(u,{headers});
+  if(r.status===401){ const e=new Error("badKey"); e.code="badKey"; throw e; }
+  if(!r.ok) throw new Error("http "+r.status);
+  return r.json();
+}
+
+function genreIds(keys, kind){ // kind 0 film / 1 serial
+  return [...new Set(keys.map(k=>GENRES[k][kind]).filter(Boolean))];
+}
+function buildQuery(kind){
+  const q={language:tmdbLang(), include_adult:"false", "vote_count.gte": kind===0?150:60, sort_by:"popularity.desc"};
+  const groups=[];
+  if(state.genre.size){ const g=genreIds([...state.genre],kind); if(!g.length) return null; groups.push(g.join("|")); }
+  if(state.mood.size){ const keys=[...state.mood].flatMap(m=>MOOD_GENRES[m]); const g=genreIds(keys,kind); if(!g.length) return null; groups.push(g.join("|")); }
+  if(state.opts.has("kids")) groups.push("10751");
+  if(groups.length) q.with_genres=groups.join(",");
+  const without=[];
+  if(state.opts.has("kids") || [...state.mood].some(m=>"LHZ".includes(m))) { if(kind===0) without.push(27); }
+  if(without.length) q.without_genres=without.join(",");
+  // kraj produkcji
+  const cs = state.country.size ? [...state.country] : (state.region==="eu" ? EUROPE : []);
+  if(cs.length) q.with_origin_country=cs.join("|");
+  // długość
+  if(state.len.size && state.len.size<3){
+    const b = kind===0 ? {s:[0,100],m:[100,130],l:[130,600]} : {s:[0,35],m:[35,55],l:[55,300]};
+    const sel=[...state.len].map(v=>b[v]);
+    q["with_runtime.gte"]=Math.min(...sel.map(x=>x[0])); q["with_runtime.lte"]=Math.max(...sel.map(x=>x[1]));
+  }
+  // epoka / nowości
+  const dk = kind===0 ? "primary_release_date" : "first_air_date";
+  let from=null,to=null;
+  if(state.era.size){ const e=ERAS.filter(x=>state.era.has(x.v)); from=e.map(x=>x.from).sort()[0]; to=e.map(x=>x.to).sort().pop(); }
+  if(state.opts.has("new")){ const d=new Date(); d.setDate(d.getDate()-180); from=d.toISOString().slice(0,10); q["vote_count.gte"]=10; }
+  const today=new Date().toISOString().slice(0,10);
+  if(from) q[dk+".gte"]=from;
+  q[dk+".lte"]= to && to<today ? to : today;
+  if(state.rating) q["vote_average.gte"]=state.rating;
+  // platformy
+  q.watch_region=state.watch;
+  if(state.plat.size){ q.with_watch_providers=[...state.plat].join("|"); q.with_watch_monetization_types="flatrate"; }
+  return q;
+}
+
+async function discover(kind, n){
+  const q=buildQuery(kind);
+  if(!q) return {items:[],total:0};
+  const path = kind===0 ? "/discover/movie" : "/discover/tv";
+  const first=await tmdb(path,{...q,page:1});
+  const pages=Math.min(first.total_pages||0,500);
+  if(!pages) return {items:[],total:0};
+  const tries = [];
+  const want = n===3 ? 2 : 1;
+  for(let i=0;i<want;i++) tries.push(1+Math.floor(Math.random()*pages));
+  let results=[];
+  for(const p of [...new Set(tries)]){ const r = p===1 ? first : await tmdb(path,{...q,page:p}); results=results.concat(r.results||[]); }
+  const type = kind===0?"movie":"tv";
+  let items=results.map(r=>({id:r.id,type,title:r.title||r.name,orig:r.original_title||r.original_name,year:(r.release_date||r.first_air_date||"").slice(0,4),poster:r.poster_path,backdrop:r.backdrop_path,vote:r.vote_average,cc:(r.origin_country||[])[0]||""}));
+  if(state.opts.has("skip")){ const w=new Set(lists.watched.map(keyOf)); items=items.filter(x=>!w.has(keyOf(x))); }
+  return {items,total:first.total_results||0};
+}
+
+async function details(item){
+  const k=keyOf(item)+"|"+lang+"|"+state.watch;
+  if(detailCache[k]) return detailCache[k];
+  const d=await tmdb(`/${item.type}/${item.id}`,{language:tmdbLang(),append_to_response:"videos,watch/providers",include_video_language:`${lang},en,null`});
+  if(!d.overview && lang!=="en"){ try{ const en=await tmdb(`/${item.type}/${item.id}`,{language:"en-US"}); d.overview=en.overview; d._enOverview=true; }catch(e){} }
+  return detailCache[k]=d;
+}
+
+async function loadProviders(){
+  const reg=state.watch;
+  if(providerCache[reg]) return providerCache[reg];
+  const [m,tv]=await Promise.all([tmdb("/watch/providers/movie",{watch_region:reg,language:tmdbLang()}),tmdb("/watch/providers/tv",{watch_region:reg,language:tmdbLang()})]);
+  const map={};
+  [...(m.results||[]),...(tv.results||[])].forEach(p=>{
+    const pr=(p.display_priorities||{})[reg] ?? p.display_priority ?? 999;
+    if(!map[p.provider_id] || map[p.provider_id].pr>pr) map[p.provider_id]={id:p.provider_id,name:p.provider_name,logo:p.logo_path,pr};
+  });
+  return providerCache[reg]=Object.values(map).sort((a,b)=>a.pr-b.pr).slice(0,18);
+}
+
+/* ---------- Filtry (UI) ---------- */
+function chip(html, value, key, single){
+  const b=document.createElement("button");
+  b.className="chip"; b.type="button";
+  const on = single ? state[key]===value : state[key].has(value);
+  b.setAttribute("aria-pressed", on);
+  b.innerHTML=html;
+  b.onclick=()=>{
+    if(single){ state[key] = state[key]===value ? 0 : value; renderRating(); }
+    else { state[key].has(value)?state[key].delete(value):state[key].add(value); b.setAttribute("aria-pressed", state[key].has(value)); }
+    save();
+  };
+  return b;
+}
+function fill(id, items){ const el=document.getElementById(id); el.innerHTML=""; items.forEach(x=>el.appendChild(x)); }
+function renderLen(){
+  const L=[t("short"),t("mid"),t("long")];
+  const sub = state.type==="movie"?[t("fS"),t("fM"),t("fL")]:state.type==="tv"?[t("sS"),t("sM"),t("sL")]:["","",""];
+  fill("len",["s","m","l"].map((v,i)=>chip(L[i]+(sub[i]?` <small>${sub[i]}</small>`:""),v,"len")));
+}
+function renderRating(){ fill("rating", RATINGS.map(r=>chip(`★ ${r}+`,r,"rating",true))); }
+function renderCountries(){
+  const list = state.region==="eu" ? EUROPE : [...EUROPE,...WORLD_EXTRA];
+  const sorted=[...list].sort((a,b)=>cName(a).localeCompare(cName(b),lang));
+  fill("country", sorted.map(cc=>chip(`${flag(cc)} ${esc(cName(cc))}`,cc,"country")));
+}
+function renderWatch(){
+  const sel=document.getElementById("watchSel"); sel.innerHTML="";
+  [...WATCH_COUNTRIES].sort((a,b)=>cName(a).localeCompare(cName(b),lang)).forEach(cc=>{
+    const o=document.createElement("option"); o.value=cc; o.textContent=`${flag(cc)} ${cName(cc)}`; sel.appendChild(o);
+  });
+  sel.value=state.watch;
+}
+async function renderPlatforms(){
+  const el=document.getElementById("plat");
+  if(!KEY){ el.innerHTML=""; return; }
+  el.innerHTML=`<span class="hint">${t("platLoading")}</span>`;
+  try{
+    const ps=await loadProviders();
+    fill("plat", ps.map(p=>chip(`<img class="plogo" src="${IMG}w92${p.logo}" alt="" loading="lazy"> ${esc(p.name)}`,p.id,"plat")));
+  }catch(e){ el.innerHTML=`<span class="hint">${esc(e.code==="badKey"?t("badKey"):t("error"))}</span>`; }
+}
+function renderChips(){
+  fill("mood", MOODS.map(m=>chip(`${MOOD_EMOJI[m]} ${mName(m)}`,m,"mood")));
+  fill("genre", GENRE_KEYS.map(g=>chip(`${GENRE_EMOJI[g]} ${gName(g)}`,g,"genre")));
+  fill("era", ERAS.map(e=>chip(e.l,e.v,"era")));
+  fill("opts", [chip(`🧸 ${t("kids")}`,"kids","opts"), chip(`✨ ${t("onlyNew")}`,"new","opts"), chip(`👁️ ${t("skipWatched")}`,"skip","opts")]);
+  renderRating(); renderCountries(); renderLen(); renderWatch(); renderPlatforms();
+}
+
+/* ---------- Losowanie ---------- */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+async function draw(n){
+  const el=document.getElementById("result");
+  if(!KEY){ view={kind:"msg",text:t("noKey"),icon:"🔑"}; render(); return; }
+  if(window.innerWidth<880) el.scrollIntoView({behavior:"smooth",block:"start"});
+  view={kind:"loading"}; render();
+  document.getElementById("count").textContent="";
+  try{
+    let kinds = state.type==="movie"?[0]:state.type==="tv"?[1]:(Math.random()<0.6?[0,1]:[1,0]);
+    let res={items:[],total:0}, total=0;
+    for(const k of kinds){
+      const r=await discover(k,n); total+=r.total;
+      if(r.items.length){ res=r; if(state.type!=="any" || n===1) break; res.items=res.items.concat((await discover(1-k,n)).items); break; }
+    }
+    let items=shuffle(res.items.filter(x=>keyOf(x)!==lastKey));
+    if(!items.length) items=res.items;
+    if(!items.length){ view={kind:"none"}; render(); return; }
+    document.getElementById("count").textContent=t("found")(total);
+    if(n===3 && items.length>1){ view={kind:"trio",items:items.slice(0,3)}; render(); return; }
+    await openItem(items[0]);
+  }catch(e){ view={kind:"msg",text:e.code==="badKey"?t("badKey"):t("error"),icon:"⚠️"}; render(); }
+}
+async function openItem(item, trio){
+  lastKey=keyOf(item);
+  view={kind:"loading"}; render();
+  try{ const d=await details(item); view={kind:"item",item,d,trio}; }
+  catch(e){ view={kind:"msg",text:e.code==="badKey"?t("badKey"):t("error"),icon:"⚠️"}; }
+  render();
+}
+
+/* ---------- Wynik ---------- */
+function render(){
+  const el=document.getElementById("result");
+  if(view.kind==="empty"||view.kind==="none"){
+    el.innerHTML=`<div class="empty fade"><span class="big" aria-hidden="true">${view.kind==="none"?"🫖":"🛋️"}</span><p>${t(view.kind)}</p></div>`; return;
+  }
+  if(view.kind==="msg"){ el.innerHTML=`<div class="empty fade"><span class="big" aria-hidden="true">${view.icon}</span><p>${esc(view.text)}</p></div>`; return; }
+  if(view.kind==="loading"){ el.innerHTML=`<div class="empty"><span class="big spin" aria-hidden="true">🎲</span><p>${t("loading")}</p></div>`; return; }
+  if(view.kind==="trio"){
+    el.innerHTML=`<div class="fade trio"><p class="trio-head">${t("pick3")}</p>${view.items.map((x,i)=>`
+      <button class="mini" data-i="${i}">${x.poster?`<img src="${IMG}w154${x.poster}" alt="" loading="lazy">`:`<span class="sw">🎬</span>`}
+      <span><b>${esc(x.title)}</b><small>${x.type==="movie"?t("film"):t("serial")} · ${x.year||""}${x.vote?` · ★ ${x.vote.toFixed(1)}`:""}</small></span></button>`).join("")}</div>`;
+    el.querySelectorAll(".mini").forEach(b=>b.onclick=()=>openItem(view.items[+b.dataset.i], view.items));
+    return;
+  }
+  const {item,d}=view;
+  const title=d.title||d.name||item.title, orig=d.original_title||d.original_name||"";
+  const year=(d.release_date||d.first_air_date||"").slice(0,4);
+  const cc=(d.origin_country||[])[0]||(d.production_countries||[])[0]?.iso_3166_1||"";
+  let dur="";
+  if(item.type==="movie" && d.runtime) dur=`${Math.floor(d.runtime/60)} h ${d.runtime%60} min`;
+  if(item.type==="tv"){ const rt=(d.episode_run_time||[])[0]||d.last_episode_to_air?.runtime; dur=[d.number_of_seasons?t("seasons")(d.number_of_seasons):"", rt?`${rt} ${t("perEp")}`:""].filter(Boolean).join(" · "); }
+  const vids=(d.videos?.results||[]).filter(v=>v.site==="YouTube");
+  const vid=vids.find(v=>v.type==="Trailer"&&v.iso_639_1===lang)||vids.find(v=>v.type==="Trailer")||vids.find(v=>v.type==="Teaser")||vids[0];
+  const wp=(d["watch/providers"]?.results||{})[state.watch];
+  const flat=wp?.flatrate||[];
+  const w=lists.watched.some(x=>keyOf(x)===keyOf(item)), l=lists.later.some(x=>keyOf(x)===keyOf(item));
+  const bg = d.backdrop_path ? `background-image:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),url(${IMG}w780${d.backdrop_path})` : "";
+  el.innerHTML=`
+    <div class="fade" style="display:flex;flex-direction:column;flex:1">
+      ${view.trio?`<button class="back" id="back">${t("back")}</button>`:""}
+      <div class="hero" style="${bg}">
+        ${d.poster_path?`<img class="poster-img" src="${IMG}w342${d.poster_path}" alt="">`:""}
+        <span class="tag">${item.type==="movie"?t("film"):t("serial")}</span>
+      </div>
+      <h3 class="title">${esc(title)}</h3>
+      <p class="orig">${[orig&&orig!==title?esc(orig):"",year].filter(Boolean).join(" · ")}</p>
+      <div class="meta">
+        ${d.vote_average?`<span class="score">★ ${d.vote_average.toFixed(1)}</span>`:""}
+        ${cc?`<span>${flag(cc)} ${esc(cName(cc))}</span>`:""}
+        ${dur?`<span>⏱ ${dur}</span>`:""}
+      </div>
+      <p class="desc">${esc(d.overview||"")}${d._enOverview?`<span class="note">EN</span>`:""}</p>
+      <div class="pills">${(d.genres||[]).map(g=>`<span class="pill">${esc(g.name)}</span>`).join("")}</div>
+      <div class="where">
+        <h4>${t("whereWatch")} · ${flag(state.watch)}</h4>
+        ${flat.length?`<div class="plats">${flat.map(p=>`<span class="plat"><img class="plogo" src="${IMG}w92${p.logo_path}" alt=""> ${esc(p.provider_name)}</span>`).join("")}</div>`:`<p class="hint">${t("notStreaming")}</p>`}
+        ${wp?.link?`<a class="more" href="${wp.link}" target="_blank" rel="noopener">${t("more")} →</a>`:""}
+      </div>
+      <div class="actions">
+        ${vid?`<button class="act trailer" id="tr">▶ ${t("trailer")}</button>`:`<a class="act trailer" href="https://www.youtube.com/results?search_query=${encodeURIComponent((item.orig||title)+" "+year+" trailer")}" target="_blank" rel="noopener">▶ ${t("trailer")}</a>`}
+        <button class="act" id="mw" aria-pressed="${w}">✓ ${t("markWatched")}</button>
+        <button class="act" id="ml" aria-pressed="${l}">☆ ${t("addLater")}</button>
+      </div>
+      <div style="height:16px"></div>
+      <button class="again" id="again">${t("again")}</button>
+    </div>`;
+  const rec={id:item.id,type:item.type,title,year,poster:d.poster_path||item.poster};
+  document.getElementById("again").onclick=()=>draw(1);
+  document.getElementById("mw").onclick=()=>toggleList("watched",rec);
+  document.getElementById("ml").onclick=()=>toggleList("later",rec);
+  if(vid) document.getElementById("tr").onclick=()=>openTrailer(vid.key);
+  if(view.trio) document.getElementById("back").onclick=()=>{ view={kind:"trio",items:view.trio}; render(); };
+}
+
+/* ---------- Trailer ---------- */
+function openTrailer(key){
+  const m=document.getElementById("modal");
+  m.querySelector(".frame").innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(key)}?autoplay=1&rel=0" title="Trailer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  m.hidden=false;
+}
+function closeTrailer(){ const m=document.getElementById("modal"); m.hidden=true; m.querySelector(".frame").innerHTML=""; }
+
+/* ---------- Listy ---------- */
+function toggleList(name,rec){
+  const arr=lists[name], i=arr.findIndex(x=>keyOf(x)===keyOf(rec));
+  if(i>=0) arr.splice(i,1); else {
+    arr.unshift(rec);
+    if(name==="watched"){ const j=lists.later.findIndex(x=>keyOf(x)===keyOf(rec)); if(j>=0) lists.later.splice(j,1); }
+  }
+  save(); render(); renderLists();
+}
+function renderLists(){
+  document.querySelectorAll("#tabs button").forEach(b=>{
+    b.setAttribute("aria-pressed", b.dataset.tab===listTab);
+    b.textContent=`${t(b.dataset.tab)} (${lists[b.dataset.tab].length})`;
+  });
+  const ul=document.getElementById("list"), arr=lists[listTab];
+  if(!arr.length){ ul.innerHTML=`<li class="list-empty">${t("emptyList")}</li>`; return; }
+  ul.innerHTML=arr.map((x,i)=>`<li><button class="open" data-i="${i}">${x.poster?`<img src="${IMG}w92${x.poster}" alt="">`:""}<span>${esc(x.title)} <small>${x.year||""}</small></span></button>
+    <button class="rm" data-i="${i}" aria-label="${t("remove")}">×</button></li>`).join("");
+  ul.querySelectorAll(".open").forEach(b=>b.onclick=()=>{ openItem(arr[+b.dataset.i]);
+    if(window.innerWidth<880) document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"}); });
+  ul.querySelectorAll(".rm").forEach(b=>b.onclick=()=>{ arr.splice(+b.dataset.i,1); save(); renderLists(); if(view.kind==="item") render(); });
+}
+
+/* ---------- Motyw i język ---------- */
+function setTheme(th){
+  document.documentElement.dataset.theme=th;
+  document.getElementById("themeBtn").textContent = th==="dark" ? "☀️" : "🌙";
+  try{ localStorage.setItem("tp-theme",th); }catch(e){}
+}
+function initTheme(){
+  let th=null; try{ th=localStorage.getItem("tp-theme"); }catch(e){}
+  if(!th) th = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  setTheme(th);
+}
+function setPressed(sel, attr, val){ document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed", b.dataset[attr]===val)); }
+function applyLang(){
+  try{ regionNames=new Intl.DisplayNames([lang],{type:"region"}); }catch(e){ regionNames={of:c=>c}; }
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.getElementById("filters").setAttribute("aria-label",t("filters"));
+  document.getElementById("themeBtn").setAttribute("aria-label",t("theme"));
+  document.querySelector("#modal .close").setAttribute("aria-label",t("close"));
+  document.getElementById("langSel").value=lang;
+  renderChips(); renderLists();
+  if(view.kind==="item"){ openItem(view.item, view.trio); } else render();
+  if(!KEY){ view={kind:"msg",text:t("noKey"),icon:"🔑"}; render(); }
+}
+
+/* ---------- Zdarzenia ---------- */
+const langSel=document.getElementById("langSel");
+LANGS.forEach(([code,name])=>{ const o=document.createElement("option"); o.value=code; o.textContent=name; langSel.appendChild(o); });
+langSel.onchange=()=>{ lang=langSel.value; save(); applyLang(); };
+document.getElementById("watchSel").onchange=e=>{ state.watch=e.target.value; state.plat.clear(); save(); renderPlatforms(); if(view.kind==="item") openItem(view.item, view.trio); };
+document.getElementById("themeBtn").onclick=()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+document.querySelectorAll("#type button").forEach(b=>b.onclick=()=>{ state.type=b.dataset.v; setPressed("#type button","v",state.type); renderLen(); save(); });
+document.querySelectorAll("#region button").forEach(b=>b.onclick=()=>{
+  state.region=b.dataset.v; setPressed("#region button","v",state.region);
+  if(state.region==="eu") [...state.country].forEach(cc=>{ if(!EUROPE.includes(cc)) state.country.delete(cc); });
+  renderCountries(); save();
+});
+document.querySelectorAll("[data-clear]").forEach(b=>b.onclick=()=>{
+  const k=b.dataset.clear;
+  if(k==="rating"){ state.rating=0; renderRating(); } else { state[k].clear(); document.querySelectorAll(`#${k} .chip`).forEach(c=>c.setAttribute("aria-pressed","false")); }
+  save();
+});
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{ listTab=b.dataset.tab; renderLists(); });
+document.getElementById("draw").onclick=()=>draw(1);
+document.getElementById("draw3").onclick=()=>draw(3);
+document.querySelector("#modal .close").onclick=closeTrailer;
+document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") closeTrailer(); };
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeTrailer(); });
+
+initTheme();
+load();
+setPressed("#type button","v",state.type);
+setPressed("#region button","v",state.region);
+applyLang();
+</script>
+</body>
+</html>
