@@ -292,6 +292,14 @@
   <div class="layout">
     <section class="card" id="filters">
       <div class="group">
+        <div class="group-head"><h2 data-i18n="hWatch"></h2><span class="hint" data-i18n="watchHint"></span></div>
+        <select id="watchSel" class="select-sel" aria-label="Country"></select>
+      </div>
+      <div class="group">
+        <div class="group-head"><h2 data-i18n="hPlat"></h2><span class="hint" id="platWhere" hidden></span><button class="clear" data-clear="plat" data-i18n="clear"></button></div>
+        <div class="chips" id="plat"></div>
+      </div>
+      <div class="group">
         <div class="group-head"><h2 data-i18n="hType"></h2></div>
         <div class="segment" id="type">
           <button data-v="any" data-i18n="any"></button>
@@ -300,19 +308,11 @@
         </div>
       </div>
       <div class="group">
-        <div class="group-head"><h2 data-i18n="hPlat"></h2><span class="hint" id="platWhere"></span><button class="clear" data-clear="plat" data-i18n="clear"></button></div>
-        <div class="chips" id="plat"></div>
-      </div>
-      <div class="group">
         <div class="group-head"><h2 data-i18n="hMood"></h2><button class="clear" data-clear="mood" data-i18n="clear"></button></div>
         <div class="chips" id="mood"></div>
       </div>
       <details class="morefilters" id="more">
         <summary><span class="ico-slot" data-ico="sliders"></span> <span data-i18n="moreFilters"></span> <span class="badge" id="activeCount"></span><span class="ico-slot chev" data-ico="chevron"></span></summary>
-      <div class="group">
-        <div class="group-head"><h2 data-i18n="hWatch"></h2><span class="hint" data-i18n="watchHint"></span></div>
-        <select id="watchSel" class="select-sel" aria-label="Country"></select>
-      </div>
       <div class="group">
         <div class="group-head"><h2 data-i18n="hRegion"></h2></div>
         <div class="segment two" id="region">
